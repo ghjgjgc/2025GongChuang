@@ -282,6 +282,7 @@ class Eyes_task(fundation):
                 if flagcount >= 3:
                     uart.uart_send_angle(0x00, 0x00, 0x00, 0x03)
                     break
+        global_task = Raw_Material_Scanning
 
 if __name__ == "__main__":
 
