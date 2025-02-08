@@ -270,7 +270,7 @@ class Eyes_task(fundation):
         global img, ret, cam_process, global_task,global_color
         flagcount = 0
         while True:
-            if not ret or img is None:
+            if not ret or img is None or global_color==0: # 0 代表32忙中，还没完成移动
                 continue
             X, Y = self.parallel(img)
             if X != -128 and Y != -128: # 康的代码中只是将数字扩大100放入，理论上正负相同 且actan在-90到90之间，没有溢出问题

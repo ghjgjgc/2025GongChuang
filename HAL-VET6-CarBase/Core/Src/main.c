@@ -62,10 +62,7 @@ void Rough_processing(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-//将直线插补加了个LED控制
-//写好了原料区的所有控�?
-//添加角度修正的控制代�?
-//同步启动有了，重新修好了PARTTIMEJOB
+
 /* USER CODE END 0 */
 
 /**
@@ -377,15 +374,73 @@ void Rough_processing(void)
       ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+50,Claw_Release,100,1);
       //Goto Midpoint
       ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
-
-
+      //Goto PacePoint
+      ROBOTICArm_DirectlyMove(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_PlacementLocation_Unstack.ZPosition+100,Claw_ReleaseFull,700,500);
+      while(ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_PlacementLocation_Unstack.ZPosition,Claw_ReleaseFull,700,500)!=HAL_OK);
+      break;
+    case Green:\
+      //Claw from WareHouse
+      ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+50,Claw_Clawing,800,1);
+      ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition,Claw_Release,200,300);
+      ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+50,Claw_Release,100,1);
+      //Goto Midpoint
+      ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
+      //Goto PacePoint
+      ROBOTICArm_DirectlyMove(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition+100,Claw_ReleaseFull,700,500);
+      while(ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition,Claw_ReleaseFull,700,500)!=HAL_OK);
+      break;
+    case Blue:
+      //Claw from WareHouse
+      ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+50,Claw_Clawing,800,1);
+      ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition,Claw_Release,200,500);
+      ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+50,Claw_Release,100,1);
+      //Goto Midpoint
+      ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
+      //Goto PacePoint
+      ROBOTICArm_DirectlyMove(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition+100,Claw_ReleaseFull,700,500);
+      while(ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition,Claw_ReleaseFull,700,500)!=HAL_OK);
+      break;
+    default:
+      break;
+    }
+    //Goto Midpoint
+    ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
+    n++;
+  }
+  n=0;
+  for (; n < 3;)
+  {
+    switch (Mission_Order[n+Rough_processing_CNT*3])
+    {
+    case Red:
+      //Claw from PacePoint
+      ROBOTICArm_DirectlyMove(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_PlacementLocation_Unstack.ZPosition+100,Claw_ReleaseFull,700,500);
+      ROBOTICArm_DirectlyMove(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_PlacementLocation_Unstack.ZPosition,Claw_ReleaseFull,700,500);
+      //Goto Midpoint
+      ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
+      //Goto WareHouse
+      ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+50,Claw_Clawing,1000,1);
+      ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition,Claw_Release,200,300);
+      ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+50,Claw_Release,100,1);
       break;
     case Green:
+      //Claw from WareHouse
+      ROBOTICArm_DirectlyMove(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition+100,Claw_ReleaseFull,700,500);
+      ROBOTICArm_DirectlyMove(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition,Claw_ReleaseFull,700,500);
+      //Goto Midpoint
+      ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
+      //Goto PacePoint
       ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+50,Claw_Clawing,800,1);
       ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition,Claw_Release,200,300);
       ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+50,Claw_Release,100,1);
       break;
     case Blue:
+      //Claw from WareHouse
+      ROBOTICArm_DirectlyMove(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition+100,Claw_ReleaseFull,700,500);
+      ROBOTICArm_DirectlyMove(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition,Claw_ReleaseFull,700,500);
+      //Goto Midpoint
+      ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
+      //Goto PacePoint
       ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+50,Claw_Clawing,800,1);
       ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition,Claw_Release,200,500);
       ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+50,Claw_Release,100,1);
@@ -393,11 +448,12 @@ void Rough_processing(void)
     default:
       break;
     }
+    //Goto Midpoint
+    ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
     n++;
   }
-  
-  
 }
+
 /**
  * @brief LED switch
  * 

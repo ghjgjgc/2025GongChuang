@@ -94,7 +94,6 @@ void MX_UART5_Init(void)
 
 }
 /* USART1 init function */
-
 void MX_USART1_UART_Init(void)
 {
 
@@ -122,7 +121,6 @@ void MX_USART1_UART_Init(void)
   /* USER CODE END USART1_Init 2 */
 
 }
-
 void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 {
 
@@ -297,7 +295,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
   /* USER CODE END USART1_MspInit 1 */
   }
 }
-
 void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 {
 
@@ -373,7 +370,6 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   /* USER CODE END USART1_MspDeInit 1 */
   }
 }
-
 /* USER CODE BEGIN 1 */
 /**
  * @brief UART4 Send Byte

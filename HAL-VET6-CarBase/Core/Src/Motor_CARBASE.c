@@ -8,7 +8,6 @@
 /* USER CODE BEGIN PV */
     //Define Key Value
     const float Motor2_P=1,Motor3_P=1,Motor2_D=1,Motor3_D=1;
-    
     const float TimerCost=(1679+1)*(9999+1)/168000000; //0.1s
     const float Maxium_Speed_Set = 5000; // mm/Maxium_Speed_Set
     const float Motor_Acceleration = 1.0f * PI * 75.0f / 60.0f ; //mm/TimerCost //3.92
@@ -23,74 +22,26 @@
     int8_t OverAll_PostureX,OverAll_PostureY;
     //Definition of data type
     struct Car_Pose{
-    float X_POSITION;
-    float Y_POSITION;
-    Car_Posture Posture;
-    }Current_CARPOSITION_GLOBAL={0.0,0.0,Car_Posture_Up};
+        float X_POSITION;
+        float Y_POSITION;
+        Car_Posture Posture;
+    };
+    struct Car_Pose Current_CARPOSITION_GLOBAL={100.0,100.0,Car_Posture_Up},None_CARPOSITION={0,0,Car_Posture_Up};
     extern TIM_HandleTypeDef htim10;
     extern const ROBOTICArm_Pose Relay_point;
 /* USER CODE END PV */
-/**
- * @brief Move the vehicle to the corresponding world coordinate point.
- * 
- * @param X_AIMPOSITION world coordinate X_AIMPOSITION.
- * @param Y_AIMPOSITION world coordinate Y_AIMPOSITION.
- * @param Aim_Posture CarPosture
- * @param function part_timeJob
- */
-void CarMove_TO(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time ))
+void CarMove_TO_Relative(struct Car_Pose Aim_CARPOSITON_RELATIVE,struct Car_Pose Current_CARPOSITION_RELATIVE , 
+    HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time ))
 {
-    struct Car_Pose Current_CARPOSITION_RELATIVE,Aim_CARPOSITON;
-    /**
-     * @param Car_Posture_Up: x2 = x1 ; y2 = y1
-     * @param Car_Posture_Left: x3 = -y1 ; y3 = x1
-     * @param Car_Posture_Down: x4 = -x1 ; y4 = -y1
-     * @param Car_Posture_Right: x5 = y1 ; y5 = -x1
-     */
-    switch(Current_CARPOSITION_GLOBAL.Posture)//coordinate transformation 
-    {
-        case Car_Posture_Up:
-            Current_CARPOSITION_RELATIVE.X_POSITION=Current_CARPOSITION_GLOBAL.X_POSITION;
-            Current_CARPOSITION_RELATIVE.Y_POSITION=Current_CARPOSITION_GLOBAL.Y_POSITION;
-            Current_CARPOSITION_RELATIVE.Posture=Current_CARPOSITION_GLOBAL.Posture;
-            Aim_CARPOSITON.X_POSITION=X_AIMPOSITION;
-            Aim_CARPOSITON.Y_POSITION=Y_AIMPOSITION;
-            Aim_CARPOSITON.Posture=Aim_Posture;
-            break;
-        case Car_Posture_Left:
-            Current_CARPOSITION_RELATIVE.X_POSITION=-Current_CARPOSITION_GLOBAL.Y_POSITION;
-            Current_CARPOSITION_RELATIVE.Y_POSITION=Current_CARPOSITION_GLOBAL.X_POSITION;
-            Current_CARPOSITION_RELATIVE.Posture=Current_CARPOSITION_GLOBAL.Posture;
-            Aim_CARPOSITON.X_POSITION=-Y_AIMPOSITION;
-            Aim_CARPOSITON.Y_POSITION=X_AIMPOSITION;
-            Aim_CARPOSITON.Posture=Aim_Posture;
-            break;
-        case Car_Posture_Down:
-            Current_CARPOSITION_RELATIVE.X_POSITION=-Current_CARPOSITION_GLOBAL.X_POSITION;
-            Current_CARPOSITION_RELATIVE.Y_POSITION=-Current_CARPOSITION_GLOBAL.Y_POSITION;
-            Current_CARPOSITION_RELATIVE.Posture=Current_CARPOSITION_GLOBAL.Posture;
-            Aim_CARPOSITON.X_POSITION=-X_AIMPOSITION;
-            Aim_CARPOSITON.Y_POSITION=-Y_AIMPOSITION;
-            Aim_CARPOSITON.Posture=Aim_Posture;
-            break;
-        case Car_Posture_Right:
-            Current_CARPOSITION_RELATIVE.X_POSITION=Current_CARPOSITION_GLOBAL.Y_POSITION;
-            Current_CARPOSITION_RELATIVE.Y_POSITION=-Current_CARPOSITION_GLOBAL.X_POSITION;
-            Current_CARPOSITION_RELATIVE.Posture=Current_CARPOSITION_GLOBAL.Posture;
-            Aim_CARPOSITON.X_POSITION=Y_AIMPOSITION;
-            Aim_CARPOSITON.Y_POSITION=-X_AIMPOSITION;
-            Aim_CARPOSITON.Posture=Aim_Posture;
-            break;
-        default:break;
-    }
-    float X_Distance = offsetsX*fabs(Aim_CARPOSITON.X_POSITION - Current_CARPOSITION_RELATIVE.X_POSITION);
-    float Y_Distance = offsetsY*fabs(Aim_CARPOSITON.Y_POSITION - Current_CARPOSITION_RELATIVE.Y_POSITION);
+    //Calculate the actual operating distance.
+    float X_Distance = offsetsX*fabs(Aim_CARPOSITON_RELATIVE.X_POSITION - Current_CARPOSITION_RELATIVE.X_POSITION);
+    float Y_Distance = offsetsY*fabs(Aim_CARPOSITON_RELATIVE.Y_POSITION - Current_CARPOSITION_RELATIVE.Y_POSITION);
 
-    OverAll_PostureX=(Aim_CARPOSITON.X_POSITION - Current_CARPOSITION_RELATIVE.X_POSITION) >= 0 ? 1:-1;
-    OverAll_PostureY=(Aim_CARPOSITON.Y_POSITION - Current_CARPOSITION_RELATIVE.Y_POSITION) >= 0 ? 1:-1;
+    //Determine the direction of the vehicle's operation.
+    OverAll_PostureX=(Aim_CARPOSITON_RELATIVE.X_POSITION - Current_CARPOSITION_RELATIVE.X_POSITION) >= 0 ? 1:-1;
+    OverAll_PostureY=(Aim_CARPOSITON_RELATIVE.Y_POSITION - Current_CARPOSITION_RELATIVE.Y_POSITION) >= 0 ? 1:-1;
 
-    //---------------------------Begin Setting Maxium Speed----------------------------//
-    
+    //Calculate the maximum speed of the entire vehicle and the count value of special points.
     if(Maxium_Speed_Set*Maxium_Speed_Set/(Motor_Acceleration)>X_Distance) //Indicates that the distance required for acceleration is greater than the target distance at this point
         {Maxium_Speed_ActualX = sqrt(X_Distance * (Motor_Acceleration));NotUp_To_MaxSpeed_FlagX=Yes;SpeedHold_CNTX=0;}
     else {Maxium_Speed_ActualX = Maxium_Speed_Set;NotUp_To_MaxSpeed_FlagX=No;SpeedHold_CNTX=X_Distance-(Maxium_Speed_Set*Maxium_Speed_Set)/Motor_Acceleration;}
@@ -103,27 +54,32 @@ void CarMove_TO(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,
 
     Total_CNTX=StartEnd_CostCNTX*2+SpeedHold_CNTX;
     Total_CNTY=StartEnd_CostCNTY*2+SpeedHold_CNTY;
-		
+
+    //Determine the stopping count value.
     if(Total_CNTX>=Total_CNTY)
     Key_CNT=Total_CNTX;
     else Key_CNT=Total_CNTY;
 
-    //Now we have the CNTs needed for acceleration and deceleration, and the CNTs needed to maintain speed if any
-    //---------------------------End Setting Maxium Speed----------------------------//
+    /*Now we have the CNTs needed for acceleration and deceleration, and the CNTs needed to maintain speed if any*/
+
+    //The setting of the flag and the timer start to control the motor.
     If_Motor_Busy=Yes;
     HAL_TIM_Base_Start_IT(&htim10);
 
-    //---------------------BEGIN PART-TIME JOB------------------------------------//
+    //I call it "Part_timeJob" , But this feature has quite a lot of limitations
     while(If_Motor_Busy==Yes)
     {
         Part_TimeJob(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_Release,200,200);
     }
-    //-----------------------END PART-TIME JOB------------------------------------//
+
+    //The vehicle XYmovement has ended.
     MOTOR_Stop();
     HAL_Delay(20);
-    if(Current_CARPOSITION_RELATIVE.Posture!=Aim_CARPOSITON.Posture)
+
+    //The change in the angle of the entire vehicle.
+    if(Current_CARPOSITION_RELATIVE.Posture!=Aim_CARPOSITON_RELATIVE.Posture)
     {
-        float TURNED_ANGLE=Aim_CARPOSITON.Posture-Current_CARPOSITION_RELATIVE.Posture;
+        float TURNED_ANGLE=Aim_CARPOSITON_RELATIVE.Posture-Current_CARPOSITION_RELATIVE.Posture;
         Motor_PositionControl_UART(Motor1,TURNED_ANGLE>=0?Motor_Backward:Motor_Forward,1000,0x10,(uint32_t)fabs(TURNED_ANGLE)/90.0*TURNED_ANGLEPLUSE);
         Motor_PositionControl_UART(Motor2,TURNED_ANGLE>=0?Motor_Forward:Motor_Backward,1000,0x10,(uint32_t)fabs(TURNED_ANGLE)/90.0*TURNED_ANGLEPLUSE);
         Motor_PositionControl_UART(Motor3,TURNED_ANGLE>=0?Motor_Backward:Motor_Forward,1000,0x10,(uint32_t)fabs(TURNED_ANGLE)/90.0*TURNED_ANGLEPLUSE);
@@ -131,18 +87,78 @@ void CarMove_TO(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,
         MOTOR_SendMultipleStart();
         HAL_Delay(2400*fabs(TURNED_ANGLE)/90.0);
         MOTOR_Stop();
-        Target_angle=Aim_CARPOSITON.Posture;
+        Target_angle=Aim_CARPOSITON_RELATIVE.Posture;
     }
-    //------------------------BEGIN REFRESH GLOBAL POSE---------------------------//
-    Current_CARPOSITION_GLOBAL.X_POSITION=X_AIMPOSITION;
-    Current_CARPOSITION_GLOBAL.Y_POSITION=Y_AIMPOSITION;
-    Current_CARPOSITION_GLOBAL.Posture=Aim_Posture;
-    //------------------------END REFRESH GLOBAL POSE----------------------------//
     MOTOR_Stop();
+}
+/**
+ * @brief Move the vehicle to the corresponding world coordinate point.
+ * 
+ * @param X_AIMPOSITION world coordinate X_AIMPOSITION.
+ * @param Y_AIMPOSITION world coordinate Y_AIMPOSITION.
+ * @param Aim_Posture CarPosture
+ * @param function part_timeJob
+ */
+void CarMove_TO_Global(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time ))
+{
+    struct Car_Pose Current_CARPOSITION_RELATIVE , Aim_CARPOSITON_RELATIVE , Aim_CARPOSITON_GLOBAL;
+    Aim_CARPOSITON_GLOBAL.X_POSITION=X_AIMPOSITION;
+    Aim_CARPOSITON_GLOBAL.Y_POSITION=Y_AIMPOSITION;
+    Aim_CARPOSITON_GLOBAL.Posture=Aim_Posture;
+    /**
+     * @param Car_Posture_Up: x2 = x1 ; y2 = y1
+     * @param Car_Posture_Left: x3 = -y1 ; y3 = x1
+     * @param Car_Posture_Down: x4 = -x1 ; y4 = -y1
+     * @param Car_Posture_Right: x5 = y1 ; y5 = -x1
+     */
+    //Coordinate transformation 
+    switch(Current_CARPOSITION_GLOBAL.Posture)
+    {
+        case Car_Posture_Up:
+            Current_CARPOSITION_RELATIVE.X_POSITION=Current_CARPOSITION_GLOBAL.X_POSITION;
+            Current_CARPOSITION_RELATIVE.Y_POSITION=Current_CARPOSITION_GLOBAL.Y_POSITION;
+            Current_CARPOSITION_RELATIVE.Posture=Current_CARPOSITION_GLOBAL.Posture;
+            Aim_CARPOSITON_RELATIVE.X_POSITION=Aim_CARPOSITON_GLOBAL.X_POSITION;
+            Aim_CARPOSITON_RELATIVE.Y_POSITION=Aim_CARPOSITON_GLOBAL.Y_POSITION;
+            Aim_CARPOSITON_RELATIVE.Posture=Aim_Posture;
+            break;
+        case Car_Posture_Left:
+            Current_CARPOSITION_RELATIVE.X_POSITION=-Current_CARPOSITION_GLOBAL.Y_POSITION;
+            Current_CARPOSITION_RELATIVE.Y_POSITION=Current_CARPOSITION_GLOBAL.X_POSITION;
+            Current_CARPOSITION_RELATIVE.Posture=Current_CARPOSITION_GLOBAL.Posture;
+            Aim_CARPOSITON_RELATIVE.X_POSITION=-Aim_CARPOSITON_GLOBAL.Y_POSITION;
+            Aim_CARPOSITON_RELATIVE.Y_POSITION=Aim_CARPOSITON_GLOBAL.X_POSITION;
+            Aim_CARPOSITON_RELATIVE.Posture=Aim_Posture;
+            break;
+        case Car_Posture_Down:
+            Current_CARPOSITION_RELATIVE.X_POSITION=-Current_CARPOSITION_GLOBAL.X_POSITION;
+            Current_CARPOSITION_RELATIVE.Y_POSITION=-Current_CARPOSITION_GLOBAL.Y_POSITION;
+            Current_CARPOSITION_RELATIVE.Posture=Current_CARPOSITION_GLOBAL.Posture;
+            Aim_CARPOSITON_RELATIVE.X_POSITION=-Aim_CARPOSITON_GLOBAL.X_POSITION;
+            Aim_CARPOSITON_RELATIVE.Y_POSITION=-Aim_CARPOSITON_GLOBAL.Y_POSITION;
+            Aim_CARPOSITON_RELATIVE.Posture=Aim_Posture;
+            break;
+        case Car_Posture_Right:
+            Current_CARPOSITION_RELATIVE.X_POSITION=Current_CARPOSITION_GLOBAL.Y_POSITION;
+            Current_CARPOSITION_RELATIVE.Y_POSITION=-Current_CARPOSITION_GLOBAL.X_POSITION;
+            Current_CARPOSITION_RELATIVE.Posture=Current_CARPOSITION_GLOBAL.Posture;
+            Aim_CARPOSITON_RELATIVE.X_POSITION=Aim_CARPOSITON_GLOBAL.Y_POSITION;
+            Aim_CARPOSITON_RELATIVE.Y_POSITION=-Aim_CARPOSITON_GLOBAL.X_POSITION;
+            Aim_CARPOSITON_RELATIVE.Posture=Aim_Posture;
+            break;
+        default:break;
+    }
+    
+    //REFRESH GLOBAL POSE
+    Current_CARPOSITION_GLOBAL=Aim_CARPOSITON_GLOBAL;
+
+    //CarMove_TO_Relative Pose
+    CarMove_TO_Relative(Aim_CARPOSITON_RELATIVE,Current_CARPOSITION_RELATIVE,Part_TimeJob);
 }
 
 HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
 {
+    struct Car_Pose CompensationAim_Pose={0,0,Current_CARPOSITION_GLOBAL.Posture};
     switch (CODE)
     {
         case UnStacking_Correction:
@@ -152,7 +168,10 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
             {
                 if(rk3588_Arry[6]==0x01)
                 {
-                    CarMove_TO(Current_CARPOSITION_GLOBAL.X_POSITION+rk3588_Arry[4]*(rk3588_Arry[2]==0?1:-1),Current_CARPOSITION_GLOBAL.Y_POSITION+rk3588_Arry[5]*(rk3588_Arry[3]==0?1:-1),Current_CARPOSITION_GLOBAL.Posture,VOID_FUNCTION);
+                    CompensationAim_Pose.X_POSITION=rk3588_Arry[4]*(rk3588_Arry[2]==0?1:-1);
+                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[5]*(rk3588_Arry[3]==0?1:-1);
+                    CompensationAim_Pose.Posture=Current_CARPOSITION_GLOBAL.Posture;
+                    CarMove_TO_Relative(None_CARPOSITION,CompensationAim_Pose,VOID_FUNCTION);
                     rk3588_Arry[6]=0x00;
                 }
             }
@@ -161,21 +180,58 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
             {
                 if(rk3588_Arry[6]==0x01)
                 {
-                    CarMove_TO(Current_CARPOSITION_GLOBAL.X_POSITION+rk3588_Arry[4]*(rk3588_Arry[2]==0?1:-1),Current_CARPOSITION_GLOBAL.Y_POSITION+rk3588_Arry[5]*(rk3588_Arry[3]==0?1:-1),Current_CARPOSITION_GLOBAL.Posture,VOID_FUNCTION);
+                    CompensationAim_Pose.X_POSITION=rk3588_Arry[4]*(rk3588_Arry[2]==0?1:-1);
+                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[5]*(rk3588_Arry[3]==0?1:-1);
+                    CompensationAim_Pose.Posture=Current_CARPOSITION_GLOBAL.Posture;
+                    CarMove_TO_Relative(None_CARPOSITION,CompensationAim_Pose,VOID_FUNCTION);
+                    rk3588_Arry[6]=0x00;
+                }
+            }
+            return HAL_OK;
+        case Stacking_Correction:
+            Send_MissionPack(Stacking_Correction,Green);
+            ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
+            while (rk3588_Arry[6]!=0x03)
+            {
+                if(rk3588_Arry[6]==0x01)
+                {
+                    CompensationAim_Pose.X_POSITION=rk3588_Arry[4]*(rk3588_Arry[2]==0?1:-1);
+                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[5]*(rk3588_Arry[3]==0?1:-1);
+                    CompensationAim_Pose.Posture=Current_CARPOSITION_GLOBAL.Posture;
+                    CarMove_TO_Relative(None_CARPOSITION,CompensationAim_Pose,VOID_FUNCTION);
                     rk3588_Arry[6]=0x00;
                 }
             }
             return HAL_OK;
         case Angle_compensation:
             Send_MissionPack(Angle_compensation,Green);
+            while (rk3588_Arry[5]!=0x03)
+            {
+                if(rk3588_Arry[5]==0x01)
+                {
+                    Motor_PositionControl_UART(Motor1,rk3588_Arry[4] == 0 ? Motor_Forward : Motor_Backward,10,0,10*rk3588_Arry[2]+rk3588_Arry[3]);
+                    Motor_PositionControl_UART(Motor2,rk3588_Arry[4] == 0 ? Motor_Backward : Motor_Forward,10,0,10*rk3588_Arry[2]+rk3588_Arry[3]);
+                    Motor_PositionControl_UART(Motor3,rk3588_Arry[4] == 0 ? Motor_Forward : Motor_Backward,10,0,10*rk3588_Arry[2]+rk3588_Arry[3]);
+                    Motor_PositionControl_UART(Motor4,rk3588_Arry[4] == 0 ? Motor_Backward : Motor_Forward,10,0,10*rk3588_Arry[2]+rk3588_Arry[3]);
+                    MOTOR_SendMultipleStart();
+                    rk3588_Arry[5]=0x00;
+                }
+            }
+            MOTOR_Stop();
+            return HAL_OK;
         case Raw_Material_Compensation:
-            Send_MissionPack(Raw_Material_Compensation,Green);
+            Send_MissionPack(Raw_Material_Compensation,1);
             while (rk3588_Arry[6]!=0x03)
             {
                 if(rk3588_Arry[6]==0x01)
                 {
-                    CarMove_TO(Current_CARPOSITION_GLOBAL.X_POSITION+rk3588_Arry[4]*(rk3588_Arry[2]==0?1:-1),Current_CARPOSITION_GLOBAL.Y_POSITION+rk3588_Arry[5]*(rk3588_Arry[3]==0?1:-1),Current_CARPOSITION_GLOBAL.Posture,VOID_FUNCTION);
+                    Send_MissionPack(Raw_Material_Compensation,0);
+                    CompensationAim_Pose.X_POSITION=rk3588_Arry[4]*(rk3588_Arry[2]==0?1:-1);
+                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[5]*(rk3588_Arry[3]==0?1:-1);
+                    CompensationAim_Pose.Posture=Current_CARPOSITION_GLOBAL.Posture;
+                    CarMove_TO_Relative(None_CARPOSITION,CompensationAim_Pose,VOID_FUNCTION);
                     rk3588_Arry[6]=0x00;
+                    Send_MissionPack(Raw_Material_Compensation,1);
                 }
             }
             return HAL_OK;
