@@ -678,9 +678,20 @@ void SERVO_AngleSet(SERVO_Channel Target_SERVO,float Angle)
 void SERVO_ClawSet(Claw_Status AIMSTATUS)
 {
   float Angle=180.0f;
-  if(AIMSTATUS==Claw_Release)
+  switch (AIMSTATUS)
+  {
+  case Claw_Release:
     Angle=140;
-  else Angle=179;
+    break;
+  case Claw_Clawing:
+    Angle=179;
+    break;
+  case Claw_ReleaseFull:
+    Angle=100;
+    break;
+  default:
+    break;
+  }
   float Compare=(Angle/180.0f)*2000.0f+500.0f;
   __HAL_TIM_SetCompare(&htim1,TIM_CHANNEL_4,Compare);
 }

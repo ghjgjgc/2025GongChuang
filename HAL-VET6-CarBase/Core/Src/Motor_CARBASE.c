@@ -1,15 +1,15 @@
 #include "Motor_CARBASE.h"
 /* USER CODE BEGIN PD */
     #define TURNED_ANGLEPLUSE 4400
-    #define offsetsX 2.36
-	#define offsetsY 2.50
+    #define offsetsX 2.70f
+	#define offsetsY 2.90f
 /* USER CODE END PD */
 
 /* USER CODE BEGIN PV */
     //Define Key Value
-    const float Motor2_P=1,Motor3_P=1,Motor2_D=1,Motor3_D=1;
+    const float Motor_P=1.8,Motor_D=1.8;
     const float TimerCost=(1679+1)*(9999+1)/168000000; //0.1s
-    const float Maxium_Speed_Set = 5000; // mm/Maxium_Speed_Set
+    const float Maxium_Speed_Set = 2000; // mm/Maxium_Speed_Set
     const float Motor_Acceleration = 1.0f * PI * 75.0f / 60.0f ; //mm/TimerCost //3.92
     //Define Stored global variables
     int32_t StartEnd_CostCNTX=0,StartEnd_CostCNTY=0,SpeedHold_CNTX=0,SpeedHold_CNTY=0,TIM_CNT=0,Total_CNTX=0,Total_CNTY=0,Key_CNT=0;
@@ -17,6 +17,7 @@
     Motor_DIRECTION Motor1_Direction = Motor_Forward,Motor2_Direction = Motor_Forward,Motor3_Direction = Motor_Forward,Motor4_Direction = Motor_Forward;
     float Maxium_Speed_ActualX = 0 , Maxium_Speed_ActualY=0;
     float Motor1_Speed=0, Motor2_Speed=0, Motor3_Speed=0, Motor4_Speed=0,
+				Motor1_PIDSpeed=0,Motor2_PIDSpeed=0,Motor3_PIDSpeed=0,Motor4_PIDSpeed=0,
         Motor1_SpeedX=0, Motor2_SpeedX=0, Motor3_SpeedX=0, Motor4_SpeedX=0,
         Motor1_SpeedY=0, Motor2_SpeedY=0, Motor3_SpeedY=0, Motor4_SpeedY=0;
     int8_t OverAll_PostureX,OverAll_PostureY;
@@ -26,7 +27,7 @@
         float Y_POSITION;
         Car_Posture Posture;
     };
-    struct Car_Pose Current_CARPOSITION_GLOBAL={100.0,100.0,Car_Posture_Up},None_CARPOSITION={0,0,Car_Posture_Up};
+    struct Car_Pose Current_CARPOSITION_GLOBAL={0.0,0.0,Car_Posture_Up},None_CARPOSITION={0,0,Car_Posture_Up};
     extern TIM_HandleTypeDef htim10;
     extern const ROBOTICArm_Pose Relay_point;
 /* USER CODE END PV */
@@ -69,6 +70,8 @@ void CarMove_TO_Relative(struct Car_Pose Aim_CARPOSITON_RELATIVE,struct Car_Pose
     //I call it "Part_timeJob" , But this feature has quite a lot of limitations
     while(If_Motor_Busy==Yes)
     {
+        // Send_Number(angle,55);
+        HAL_Delay(10);
         Part_TimeJob(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_Release,200,200);
     }
 
@@ -162,31 +165,41 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
     switch (CODE)
     {
         case UnStacking_Correction:
-            Send_MissionPack(UnStacking_Correction,Green);
+            Send_MissionPack(UnStacking_Correction,Blue);
             ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
             while (rk3588_Arry[6]!=0x03)
             {
                 if(rk3588_Arry[6]==0x01)
                 {
-                    CompensationAim_Pose.X_POSITION=rk3588_Arry[4]*(rk3588_Arry[2]==0?1:-1);
-                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[5]*(rk3588_Arry[3]==0?1:-1);
+                    CompensationAim_Pose.X_POSITION=rk3588_Arry[2]*(rk3588_Arry[4]==0?1:-1);
+                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[3]*(rk3588_Arry[5]==1?1:-1);
                     CompensationAim_Pose.Posture=Current_CARPOSITION_GLOBAL.Posture;
+                    None_CARPOSITION.Posture=Current_CARPOSITION_GLOBAL.Posture;
                     CarMove_TO_Relative(None_CARPOSITION,CompensationAim_Pose,VOID_FUNCTION);
                     rk3588_Arry[6]=0x00;
                 }
             }
+            Send_MissionPack(UnStacking_Correction,Blue);
             ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition-100,Claw_ReleaseFull,700,500);
+            rk3588_Arry[6]=0x00;
             while (rk3588_Arry[6]!=0x03)
             {
                 if(rk3588_Arry[6]==0x01)
                 {
-                    CompensationAim_Pose.X_POSITION=rk3588_Arry[4]*(rk3588_Arry[2]==0?1:-1);
-                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[5]*(rk3588_Arry[3]==0?1:-1);
+                    if(rk3588_Arry[2]<10)rk3588_Arry[2]=10;
+                    if(rk3588_Arry[3]<10)rk3588_Arry[2]=10;
+                    CompensationAim_Pose.X_POSITION=rk3588_Arry[2]*(rk3588_Arry[4]==0?1:-1);
+                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[3]*(rk3588_Arry[5]==1?1:-1);
                     CompensationAim_Pose.Posture=Current_CARPOSITION_GLOBAL.Posture;
+                    None_CARPOSITION.Posture=Current_CARPOSITION_GLOBAL.Posture;
                     CarMove_TO_Relative(None_CARPOSITION,CompensationAim_Pose,VOID_FUNCTION);
                     rk3588_Arry[6]=0x00;
                 }
+                LED_ONOFF(LED2,1);
             }
+            LED_ONOFF(LED2,0);
+            LED_ONOFF(LED1,1);
+            Send_MissionPack(9,Blue);
             return HAL_OK;
         case Stacking_Correction:
             Send_MissionPack(Stacking_Correction,Green);
@@ -195,9 +208,10 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
             {
                 if(rk3588_Arry[6]==0x01)
                 {
-                    CompensationAim_Pose.X_POSITION=rk3588_Arry[4]*(rk3588_Arry[2]==0?1:-1);
-                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[5]*(rk3588_Arry[3]==0?1:-1);
+                    CompensationAim_Pose.X_POSITION=rk3588_Arry[2]*(rk3588_Arry[4]==0?1:-1);
+                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[3]*(rk3588_Arry[5]==1?1:-1);
                     CompensationAim_Pose.Posture=Current_CARPOSITION_GLOBAL.Posture;
+                    None_CARPOSITION.Posture=Current_CARPOSITION_GLOBAL.Posture;
                     CarMove_TO_Relative(None_CARPOSITION,CompensationAim_Pose,VOID_FUNCTION);
                     rk3588_Arry[6]=0x00;
                 }
@@ -218,20 +232,26 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
                 }
             }
             MOTOR_Stop();
+            // Target_angle = angle;
             return HAL_OK;
         case Raw_Material_Compensation:
             Send_MissionPack(Raw_Material_Compensation,1);
+            rk3588_Arry[6]=0x00;
             while (rk3588_Arry[6]!=0x03)
             {
+				HAL_Delay(10);
                 if(rk3588_Arry[6]==0x01)
                 {
+					LED_ONOFF(LED1,1);
                     Send_MissionPack(Raw_Material_Compensation,0);
-                    CompensationAim_Pose.X_POSITION=rk3588_Arry[4]*(rk3588_Arry[2]==0?1:-1);
-                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[5]*(rk3588_Arry[3]==0?1:-1);
+                    CompensationAim_Pose.X_POSITION=rk3588_Arry[3]*(rk3588_Arry[5]==1?1:-1);
+                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[2]*(rk3588_Arry[4]==1?1:-1);
                     CompensationAim_Pose.Posture=Current_CARPOSITION_GLOBAL.Posture;
+					None_CARPOSITION.Posture=Current_CARPOSITION_GLOBAL.Posture;
                     CarMove_TO_Relative(None_CARPOSITION,CompensationAim_Pose,VOID_FUNCTION);
                     rk3588_Arry[6]=0x00;
                     Send_MissionPack(Raw_Material_Compensation,1);
+//										LED_ONOFF(LED1,0);
                 }
             }
             return HAL_OK;
@@ -245,6 +265,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if(htim->Instance==TIM10)
     {
+        Gyroscopes_ARRAY_Handle();
         //Calculation of the speed of each motor in the X direction.
         switch (NotUp_To_MaxSpeed_FlagX)
         {
@@ -300,54 +321,54 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         //Calculation of the speed of each motor in the Y direction.
         switch (NotUp_To_MaxSpeed_FlagY)
         {
-            case Yes:
-                if(TIM_CNT<StartEnd_CostCNTY)
-                {
-                    Motor1_SpeedY=(TIM_CNT*Motor_Acceleration);
-                    Motor2_SpeedY=(TIM_CNT*Motor_Acceleration);
-                    Motor3_SpeedY=(TIM_CNT*Motor_Acceleration);
-                    Motor4_SpeedY=(TIM_CNT*Motor_Acceleration);
-                }
-                else if(TIM_CNT>(Total_CNTY-StartEnd_CostCNTY)&&TIM_CNT<Total_CNTY)
-                {
-                    Motor1_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
-                    Motor2_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
-                    Motor3_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
-                    Motor4_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
-                }
-                break;
-            case No:
-                if(TIM_CNT<StartEnd_CostCNTY)
-                {
-                    Motor1_SpeedY=(TIM_CNT*Motor_Acceleration);
-                    Motor2_SpeedY=(TIM_CNT*Motor_Acceleration);
-                    Motor3_SpeedY=(TIM_CNT*Motor_Acceleration);
-                    Motor4_SpeedY=(TIM_CNT*Motor_Acceleration);
-                }
-                else if(TIM_CNT>(Total_CNTY-StartEnd_CostCNTY)&&TIM_CNT<Total_CNTY)
-                {
-                    Motor1_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
-                    Motor2_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
-                    Motor3_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
-                    Motor4_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
-                }
-                else if(TIM_CNT>Total_CNTY)
-								{
-									Motor1_SpeedY=0;
-									Motor2_SpeedY=0;
-									Motor3_SpeedY=0;
-									Motor4_SpeedY=0;
-								}
-								else 
-                {
-                    Motor1_SpeedY=(Maxium_Speed_ActualY);
-                    Motor2_SpeedY=(Maxium_Speed_ActualY);
-                    Motor3_SpeedY=(Maxium_Speed_ActualY);
-                    Motor4_SpeedY=(Maxium_Speed_ActualY);
-                }
-                break;
-            default:
-                break;
+        case Yes:
+            if(TIM_CNT<StartEnd_CostCNTY)
+            {
+                Motor1_SpeedY=(TIM_CNT*Motor_Acceleration);
+                Motor2_SpeedY=(TIM_CNT*Motor_Acceleration);
+                Motor3_SpeedY=(TIM_CNT*Motor_Acceleration);
+                Motor4_SpeedY=(TIM_CNT*Motor_Acceleration);
+            }
+            else if(TIM_CNT>(Total_CNTY-StartEnd_CostCNTY)&&TIM_CNT<Total_CNTY)
+            {
+                Motor1_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
+                Motor2_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
+                Motor3_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
+                Motor4_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
+            }
+            break;
+        case No:
+            if(TIM_CNT<StartEnd_CostCNTY)
+            {
+                Motor1_SpeedY=(TIM_CNT*Motor_Acceleration);
+                Motor2_SpeedY=(TIM_CNT*Motor_Acceleration);
+                Motor3_SpeedY=(TIM_CNT*Motor_Acceleration);
+                Motor4_SpeedY=(TIM_CNT*Motor_Acceleration);
+            }
+            else if(TIM_CNT>(Total_CNTY-StartEnd_CostCNTY)&&TIM_CNT<Total_CNTY)
+            {
+                Motor1_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
+                Motor2_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
+                Motor3_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
+                Motor4_SpeedY=Maxium_Speed_ActualY-((TIM_CNT-(Total_CNTY-StartEnd_CostCNTY))*Motor_Acceleration);
+            }
+            else if(TIM_CNT>Total_CNTY)
+            {
+                Motor1_SpeedY=0;
+                Motor2_SpeedY=0;
+                Motor3_SpeedY=0;
+                Motor4_SpeedY=0;
+            }
+            else 
+            {
+                Motor1_SpeedY=(Maxium_Speed_ActualY);
+                Motor2_SpeedY=(Maxium_Speed_ActualY);
+                Motor3_SpeedY=(Maxium_Speed_ActualY);
+                Motor4_SpeedY=(Maxium_Speed_ActualY);
+            }
+            break;
+        default:
+            break;
         }
         //Accumulate all motor speeds
         Motor1_Speed=-OverAll_PostureX*Motor1_SpeedX+OverAll_PostureY*Motor1_SpeedY;
@@ -355,18 +376,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         Motor3_Speed=OverAll_PostureX*Motor3_SpeedX+OverAll_PostureY*Motor3_SpeedY;
         Motor4_Speed=-OverAll_PostureX*Motor4_SpeedX+OverAll_PostureY*Motor4_SpeedY;
         //PID control quantity input
-        Motor2_Speed-=Err_Angle*Motor2_P+Err_Angle_Past*Motor2_D;
-        Motor3_Speed+=Err_Angle*Motor3_P+Err_Angle_Past*Motor3_D;
+				Motor1_PIDSpeed=Motor1_Speed+(Err_Angle*Motor_P+(Err_Angle-Err_Angle_Past)*Motor_D);
+        Motor2_PIDSpeed=Motor2_Speed-(Err_Angle*Motor_P+(Err_Angle-Err_Angle_Past)*Motor_D);
+        Motor3_PIDSpeed=Motor3_Speed+(Err_Angle*Motor_P+(Err_Angle-Err_Angle_Past)*Motor_D);
+				Motor4_PIDSpeed=Motor4_Speed-(Err_Angle*Motor_P+(Err_Angle-Err_Angle_Past)*Motor_D);
         //Calculate the direction of rotation of the motor
-        Motor1_Direction=Motor1_Speed>=0?Motor_Forward:Motor_Backward;
-        Motor2_Direction=Motor2_Speed>=0?Motor_Forward:Motor_Backward;
-        Motor3_Direction=Motor3_Speed>=0?Motor_Forward:Motor_Backward;
-        Motor4_Direction=Motor4_Speed>=0?Motor_Forward:Motor_Backward;
+        Motor1_Direction=Motor1_PIDSpeed>=0?Motor_Forward:Motor_Backward;
+        Motor2_Direction=Motor2_PIDSpeed>=0?Motor_Forward:Motor_Backward;
+        Motor3_Direction=Motor3_PIDSpeed>=0?Motor_Forward:Motor_Backward;
+        Motor4_Direction=Motor4_PIDSpeed>=0?Motor_Forward:Motor_Backward;
         //Motor assignment
-        Motor_SpeedControl_UART(Motor1,Motor1_Direction,(uint32_t)fabs(Motor1_Speed)*10,0);
-        Motor_SpeedControl_UART(Motor2,Motor2_Direction,(uint32_t)fabs(Motor2_Speed)*10,0);
-        Motor_SpeedControl_UART(Motor3,Motor3_Direction,(uint32_t)fabs(Motor3_Speed)*10,0);
-        Motor_SpeedControl_UART(Motor4,Motor4_Direction,(uint32_t)fabs(Motor4_Speed)*10,0);
+        Motor_SpeedControl_UART(Motor1,Motor1_Direction,(uint32_t)(fabs(Motor1_PIDSpeed)*10),1);
+        Motor_SpeedControl_UART(Motor2,Motor2_Direction,(uint32_t)(fabs(Motor2_PIDSpeed)*10),1);
+        Motor_SpeedControl_UART(Motor3,Motor3_Direction,(uint32_t)(fabs(Motor3_PIDSpeed)*10),1);
+        Motor_SpeedControl_UART(Motor4,Motor4_Direction,(uint32_t)(fabs(Motor4_PIDSpeed)*10),1);
         MOTOR_SendMultipleStart();
 		TIM_CNT++;
         if(TIM_CNT>=Key_CNT)

@@ -34,6 +34,7 @@ extern "C" {
 #include "math.h"
 #include <stdio.h>  
 #include <stdlib.h> 
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -85,7 +86,7 @@ extern const int8_t Rotation_direction;
 #define PI 3.141592653589793f
 extern uint8_t DEBUG_USART[];
 typedef enum{Yes=1,No=0}Variable_Flag;
-#define Rotation_direction 1//1为�?�时针，-1为顺时针
+#define Rotation_direction 0//1为�?�时针，-1为顺时针
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

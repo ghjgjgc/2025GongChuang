@@ -20,8 +20,10 @@ typedef enum{Car_Posture_Up=0,Car_Posture_Down=180,Car_Posture_Left=90,Car_Postu
 /* USER CODE END PV */
 
 /* USER CODE BEGIN PFP */
-void CarMove_TO(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time ));
+void CarMove_TO_Global(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,
+    HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time ));
 HAL_StatusTypeDef VOID_FUNCTION(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time );
 HAL_StatusTypeDef Error_compensation(Mission_Code CODE);
+extern struct Car_Pose None_CARPOSITION;
 /* USER CODE END PFP */
 #endif 

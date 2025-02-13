@@ -56,6 +56,9 @@
                   },
                   {
                     "path": "../Core/Src/ROBOTIC_Arm.c"
+                  },
+                  {
+                    "path": "../Core/Src/OLED.c"
                   }
                 ],
                 "folders": []

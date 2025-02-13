@@ -15,13 +15,13 @@ const float Base_GreenAngle=39;
 const float Raw_Material_Area_Height=160.0f;
 
 const ROBOTICArm_Pose Raw_Material_Scanning={-160,0,210,Claw_Clawing};
-const ROBOTICArm_Pose Raw_Material_ClawFront={-140,0,120,Claw_Clawing};
-const ROBOTICArm_Pose Raw_Material_ClawLeft={-260,-80,120,Claw_Clawing};
-const ROBOTICArm_Pose Raw_Material_ClawRight={-280,80,120,Claw_Clawing};
+const ROBOTICArm_Pose Raw_Material_ClawFront={-155,0,135,Claw_Clawing};
+const ROBOTICArm_Pose Raw_Material_ClawLeft={-310,-60,135,Claw_Clawing};
+const ROBOTICArm_Pose Raw_Material_ClawRight={-300,80,135,Claw_Clawing};
 
-const ROBOTICArm_Pose Blue_Warehouse={180,70,150,Claw_Clawing};
-const ROBOTICArm_Pose Green_Warehouse={170,0,150,Claw_Clawing};
-const ROBOTICArm_Pose Red_Warehouse={180,-85,150,Claw_Clawing};
+const ROBOTICArm_Pose Blue_Warehouse={160,90,150,Claw_Clawing};
+const ROBOTICArm_Pose Green_Warehouse={165,5,150,Claw_Clawing};
+const ROBOTICArm_Pose Red_Warehouse={165,-80,150,Claw_Clawing};
 
 const ROBOTICArm_Pose Blue_PlacementLocation_Unstack={180,70,150,Claw_Clawing};
 const ROBOTICArm_Pose Green_PlacementLocation_Unstack={170,0,150,Claw_Clawing};
@@ -31,7 +31,7 @@ const ROBOTICArm_Pose Blue_PlacementLocation_stack={180,70,150,Claw_Clawing};
 const ROBOTICArm_Pose Green_PlacementLocation_stack={170,0,150,Claw_Clawing};
 const ROBOTICArm_Pose Red_PlacementLocation_stack={180,-85,150,Claw_Clawing};
 
-const ROBOTICArm_Pose Relay_point={0,200,200,Claw_Clawing};
+const ROBOTICArm_Pose Relay_point={0,200,240,Claw_Clawing};
 
 ROBOTICArm_Pose Initial_state={0,200,200,Claw_Release};
 ROBOTICArm_Pose Past_state={0,200,200,Claw_Release};
@@ -115,7 +115,6 @@ void ROBOTICArm_initialize(void)
     Past_state.YPosition=Initial_state.YPosition;
     Past_state.ZPosition=Initial_state.ZPosition;
 }
-typedef enum{FEED_Up=-1,FEED_Right=1,FEED_Not=0}FeedDir;
 /**
  * @brief Set Final_Pose
  * 
@@ -144,64 +143,53 @@ void Final_PoseSet(float Final_XPosition,float Final_YPosition,float Final_ZPosi
 HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time)
 {
     /*normal variable*/
+    const float epsilon = 1e-3;
     static uint8_t linearInterpolationAlgorithm_state=0;
     static uint16_t FeedCNT=0;
 	static float LinearX_variation,LinearY_variation,LinearZ_variation;
-	static float FeedAmount;
-	static float AimBaseK;
-	static FeedDir XDir,YDir,ZDir;
-    /*Flashing variable*/
-    static float CurrentBaseK;
-	static float CurrentBaseK_variation;
+	static float FeedAmount,Step_X,Step_Y,Step_Z;
 
     switch (linearInterpolationAlgorithm_state)
     {
-        case 0://initialize variable
+        case 0:
+            //initialize variable
             Final_PoseSet(Final_XPosition,Final_YPosition,Final_ZPosition,Claw_Control);
-
-            Current_state.XPosition=Past_state.XPosition;
-            Current_state.YPosition=Past_state.YPosition;
-            Current_state.ZPosition=Past_state.ZPosition;
+            //Refresh state
+            Current_state=Past_state;
 
             LinearX_variation=Final_state.XPosition-Past_state.XPosition;
             LinearY_variation=Final_state.YPosition-Past_state.YPosition;
             LinearZ_variation=Final_state.ZPosition-Past_state.ZPosition;
 
-            FeedAmount=linearInterpolationAlgorithm_StepNum*(fabsf(LinearX_variation)+fabsf(LinearY_variation)+fabsf(LinearZ_variation));
-            AimBaseK=LinearY_variation/LinearX_variation;
-            XDir=FEED_Up,YDir=FEED_Up,ZDir=FEED_Up;
-
-            if(LinearX_variation!=0)
-            {XDir=LinearX_variation>0?FEED_Right:FEED_Up;}else XDir=FEED_Not;
-            if(LinearY_variation!=0)
-            {YDir=LinearY_variation>0?FEED_Right:FEED_Up;}else YDir=FEED_Not;
-            if(LinearZ_variation!=0)
-            {ZDir=LinearZ_variation>0?FEED_Right:FEED_Up;}else ZDir=FEED_Not;
+            FeedAmount=linearInterpolationAlgorithm_StepNum*fmaxf(fmaxf(fabsf(LinearX_variation),fabsf(LinearY_variation)),fabsf(LinearZ_variation));
+            
+            Step_X=LinearX_variation/FeedAmount;
+            Step_Y=LinearY_variation/FeedAmount;
+            Step_Z=LinearZ_variation/FeedAmount;
             linearInterpolationAlgorithm_state=1;
+
+            FeedCNT=0;
             LED_ONOFF(LED4,1);
             return HAL_BUSY;
         case 1:
-            CurrentBaseK=(Current_state.YPosition-Past_state.YPosition)/(Current_state.XPosition-Past_state.XPosition);
-			CurrentBaseK_variation=isnan(CurrentBaseK)?1:(fabsf(CurrentBaseK)-fabsf(AimBaseK));
-            if(CurrentBaseK_variation>=0&&(fabsf(Current_state.XPosition-Final_state.XPosition)>=1||fabsf(Current_state.YPosition-Final_state.YPosition)>=1))
-            {Current_state.XPosition+=XDir*(1/linearInterpolationAlgorithm_StepNum);FeedCNT++;}
-            else{Current_state.YPosition+=YDir*(1/linearInterpolationAlgorithm_StepNum);FeedCNT++;}
-            if(ZDir!=0&&fabsf(Current_state.ZPosition-Final_state.ZPosition)>=1)
-            {Current_state.ZPosition+=ZDir*(1/linearInterpolationAlgorithm_StepNum);FeedCNT++;}
+            //Feed
+            Current_state.XPosition += Step_X;
+            Current_state.YPosition += Step_Y;
+            Current_state.ZPosition += Step_Z;
+            FeedCNT++;
+
             ROBOTICArm_Coordinate_Calculation(Current_state.XPosition,Current_state.YPosition,Current_state.ZPosition,Past_state.Claw_Control);
             // HAL_Delay(1);
-            if(FeedCNT>FeedAmount)
+            if(FeedCNT>FeedAmount||(fabsf(Current_state.XPosition - Final_state.XPosition) < epsilon &&fabsf(Current_state.YPosition - Final_state.YPosition) < epsilon &&fabsf(Current_state.ZPosition - Final_state.ZPosition) < epsilon))
             {
+                ROBOTICArm_Coordinate_Calculation(Final_state.XPosition,Final_state.YPosition,Final_state.ZPosition,Past_state.Claw_Control);//due to float
                 HAL_Delay(GoTO_Delay_Time);
                 SERVO_ClawSet(Claw_Control);
                 HAL_Delay(Claw_Delay_Time);
                 linearInterpolationAlgorithm_state=0; 
                 FeedCNT=0;
-                Past_state.XPosition=Final_state.XPosition;
-                Past_state.YPosition=Final_state.YPosition;
-                Past_state.ZPosition=Final_state.ZPosition;
-                Past_state.Claw_Control=Claw_Control;
-                ROBOTICArm_Coordinate_Calculation(Final_state.XPosition,Final_state.YPosition,Final_state.ZPosition,Past_state.Claw_Control);//due to float
+                Past_state=Final_state;
+                
                 LED_ONOFF(LED4,0);
                 return HAL_OK;
             }
@@ -209,7 +197,6 @@ HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm(float Final_XPosition,
         default:
             return HAL_OK;
     }
-
 }
 /**
  * @brief Direct movement of the robotic arm
