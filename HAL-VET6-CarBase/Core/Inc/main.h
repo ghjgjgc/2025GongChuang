@@ -32,6 +32,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "math.h"
+#include "Function.h"
 #include <stdio.h>  
 #include <stdlib.h> 
 #include <string.h>
@@ -56,9 +57,8 @@ extern UART_HandleTypeDef huart4;
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-typedef enum{LED1=1,LED2=2,LED3=3,LED4=4,LED_ALL=5}LED_Num;
+
 typedef enum{Claw_Release=1,Claw_Clawing=2,Claw_ReleaseFull=3}Claw_Status;
-void LED_ONOFF(LED_Num LED,uint8_t ON_OFF);
 extern uint8_t Gyroscopes_ARRAY[11],rk3588_Arry[9];
 /* USER CODE END EFP */
 
@@ -79,14 +79,11 @@ typedef struct {
     float ZPosition;
     Claw_Status Claw_Control;
 }ROBOTICArm_Pose;
-typedef enum{Red=0x00,Green=0x01,Blue=0x02}Color;
-extern const Color Color_Order[3];
-extern const int8_t Rotation_direction;
 
 #define PI 3.141592653589793f
 extern uint8_t DEBUG_USART[];
 typedef enum{Yes=1,No=0}Variable_Flag;
-#define Rotation_direction 0//1为�?�时针，-1为顺时针
+#define Rotation_direction  0 //1为�?�时针，-1为顺时针
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -681,13 +681,13 @@ void SERVO_ClawSet(Claw_Status AIMSTATUS)
   switch (AIMSTATUS)
   {
   case Claw_Release:
-    Angle=140;
+    Angle=150;
     break;
   case Claw_Clawing:
     Angle=179;
     break;
   case Claw_ReleaseFull:
-    Angle=100;
+    Angle=130;
     break;
   default:
     break;

@@ -1,16 +1,30 @@
 #include "Motor_CARBASE.h"
 /* USER CODE BEGIN PD */
-    #define TURNED_ANGLEPLUSE 4400
-    #define offsetsX 2.70f
-	#define offsetsY 2.90f
+    
 /* USER CODE END PD */
 
 /* USER CODE BEGIN PV */
     //Define Key Value
+    #define TURNED_ANGLEPLUSE 4400
+    #define offsetsX 2.70f
+	#define offsetsY 2.90f
+
     const float Motor_P=1.8,Motor_D=1.8;
     const float TimerCost=(1679+1)*(9999+1)/168000000; //0.1s
     const float Maxium_Speed_Set = 2000; // mm/Maxium_Speed_Set
     const float Motor_Acceleration = 1.0f * PI * 75.0f / 60.0f ; //mm/TimerCost //3.92
+
+    struct Car_Pose QR_CARPOSITION={200,500,Car_Posture_Up};
+    struct Car_Pose RawMaterial_CARPOSITION={180,1340,Car_Posture_Right};
+    struct Car_Pose RoughProcess_CARPOSITION={1800,1050,Car_Posture_Down};
+    struct Car_Pose Temporary_CARPOSITION={0,0,Car_Posture_Up};
+    
+    //Definition of data type
+    struct Car_Pose Current_CARPOSITION_GLOBAL={0.0,0.0,Car_Posture_Up};
+    struct Car_Pose None_CARPOSITION={0.0,0.0,Car_Posture_Up};
+
+    extern const ROBOTICArm_Pose Relay_point;
+
     //Define Stored global variables
     int32_t StartEnd_CostCNTX=0,StartEnd_CostCNTY=0,SpeedHold_CNTX=0,SpeedHold_CNTY=0,TIM_CNT=0,Total_CNTX=0,Total_CNTY=0,Key_CNT=0;
     Variable_Flag NotUp_To_MaxSpeed_FlagX=No,NotUp_To_MaxSpeed_FlagY=No,If_Motor_Busy=No;
@@ -21,18 +35,38 @@
         Motor1_SpeedX=0, Motor2_SpeedX=0, Motor3_SpeedX=0, Motor4_SpeedX=0,
         Motor1_SpeedY=0, Motor2_SpeedY=0, Motor3_SpeedY=0, Motor4_SpeedY=0;
     int8_t OverAll_PostureX,OverAll_PostureY;
-    //Definition of data type
-    struct Car_Pose{
-        float X_POSITION;
-        float Y_POSITION;
-        Car_Posture Posture;
-    };
-    struct Car_Pose Current_CARPOSITION_GLOBAL={0.0,0.0,Car_Posture_Up},None_CARPOSITION={0,0,Car_Posture_Up};
-    extern TIM_HandleTypeDef htim10;
-    extern const ROBOTICArm_Pose Relay_point;
 /* USER CODE END PV */
+uint8_t ArrivePack[4]={0x00,0xFD,0x9F,0x6B};
+void CarTurn(Car_Posture Current_Direction,Car_Posture Aim_Direction)
+{
+    if(abs(Current_Direction) > 180)
+    Current_Direction= abs(Current_Direction)%180 * Current_Direction>=0?-1:1;
+    float Turn_Angle = Aim_Direction - Current_Direction;
+    if(fabs(Turn_Angle)==180)
+    {
+        Motor_PositionControl_UART(Motor1,Turn_Angle>=0?Motor_Backward:Motor_Forward,1000,0x10,(uint32_t)fabs(Turn_Angle)/90.0*TURNED_ANGLEPLUSE);
+        Motor_PositionControl_UART(Motor2,Turn_Angle>=0?Motor_Forward:Motor_Backward,1000,0x10,(uint32_t)fabs(Turn_Angle)/90.0*TURNED_ANGLEPLUSE);
+        Motor_PositionControl_UART(Motor3,Turn_Angle>=0?Motor_Backward:Motor_Forward,1000,0x10,(uint32_t)fabs(Turn_Angle)/90.0*TURNED_ANGLEPLUSE);
+        Motor_PositionControl_UART(Motor4,Turn_Angle>=0?Motor_Forward:Motor_Backward,1000,0x10,(uint32_t)fabs(Turn_Angle)/90.0*TURNED_ANGLEPLUSE);
+        MOTOR_SendMultipleStart();
+        while(HAL_UART_Receive(&huart1,ArrivePack,4,0xFF)!=HAL_OK);
+        MOTOR_Stop();
+        Target_angle=Aim_Direction;
+    }
+    else
+    {
+        Motor_PositionControl_UART(Motor1,Motor_Forward,Turn_Angle>=0?1000:500,0x10,(uint32_t)fabs(Turn_Angle)/90.0*TURNED_ANGLEPLUSE*3);
+        Motor_PositionControl_UART(Motor2,Motor_Forward,Turn_Angle>=0?500:1000,0x10,(uint32_t)fabs(Turn_Angle)/90.0*TURNED_ANGLEPLUSE);
+        Motor_PositionControl_UART(Motor3,Motor_Forward,Turn_Angle>=0?1000:500,0x10,(uint32_t)fabs(Turn_Angle)/90.0*TURNED_ANGLEPLUSE*3);
+        Motor_PositionControl_UART(Motor4,Motor_Forward,Turn_Angle>=0?500:1000,0x10,(uint32_t)fabs(Turn_Angle)/90.0*TURNED_ANGLEPLUSE);
+        MOTOR_SendMultipleStart();
+        while(HAL_UART_Receive(&huart1,ArrivePack,4,0xFF)!=HAL_OK);
+        MOTOR_Stop();
+        Target_angle=Aim_Direction;
+    }
+}
 void CarMove_TO_Relative(struct Car_Pose Aim_CARPOSITON_RELATIVE,struct Car_Pose Current_CARPOSITION_RELATIVE , 
-    HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time ))
+    HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition))
 {
     //Calculate the actual operating distance.
     float X_Distance = offsetsX*fabs(Aim_CARPOSITON_RELATIVE.X_POSITION - Current_CARPOSITION_RELATIVE.X_POSITION);
@@ -72,9 +106,9 @@ void CarMove_TO_Relative(struct Car_Pose Aim_CARPOSITON_RELATIVE,struct Car_Pose
     {
         // Send_Number(angle,55);
         HAL_Delay(10);
-        Part_TimeJob(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_Release,200,200);
+        // Part_TimeJob(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition);
     }
-
+    LED_ONOFF(LED1,1);
     //The vehicle XYmovement has ended.
     MOTOR_Stop();
     HAL_Delay(20);
@@ -82,16 +116,10 @@ void CarMove_TO_Relative(struct Car_Pose Aim_CARPOSITON_RELATIVE,struct Car_Pose
     //The change in the angle of the entire vehicle.
     if(Current_CARPOSITION_RELATIVE.Posture!=Aim_CARPOSITON_RELATIVE.Posture)
     {
-        float TURNED_ANGLE=Aim_CARPOSITON_RELATIVE.Posture-Current_CARPOSITION_RELATIVE.Posture;
-        Motor_PositionControl_UART(Motor1,TURNED_ANGLE>=0?Motor_Backward:Motor_Forward,1000,0x10,(uint32_t)fabs(TURNED_ANGLE)/90.0*TURNED_ANGLEPLUSE);
-        Motor_PositionControl_UART(Motor2,TURNED_ANGLE>=0?Motor_Forward:Motor_Backward,1000,0x10,(uint32_t)fabs(TURNED_ANGLE)/90.0*TURNED_ANGLEPLUSE);
-        Motor_PositionControl_UART(Motor3,TURNED_ANGLE>=0?Motor_Backward:Motor_Forward,1000,0x10,(uint32_t)fabs(TURNED_ANGLE)/90.0*TURNED_ANGLEPLUSE);
-        Motor_PositionControl_UART(Motor4,TURNED_ANGLE>=0?Motor_Forward:Motor_Backward,1000,0x10,(uint32_t)fabs(TURNED_ANGLE)/90.0*TURNED_ANGLEPLUSE);
-        MOTOR_SendMultipleStart();
-        HAL_Delay(2400*fabs(TURNED_ANGLE)/90.0);
+        CarTurn(Current_CARPOSITION_RELATIVE.Posture,Aim_CARPOSITON_RELATIVE.Posture);
         MOTOR_Stop();
-        Target_angle=Aim_CARPOSITON_RELATIVE.Posture;
     }
+    LED_ONOFF(LED1,0);
     MOTOR_Stop();
 }
 /**
@@ -102,7 +130,7 @@ void CarMove_TO_Relative(struct Car_Pose Aim_CARPOSITON_RELATIVE,struct Car_Pose
  * @param Aim_Posture CarPosture
  * @param function part_timeJob
  */
-void CarMove_TO_Global(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time ))
+void CarMove_TO_Global(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition))
 {
     struct Car_Pose Current_CARPOSITION_RELATIVE , Aim_CARPOSITON_RELATIVE , Aim_CARPOSITON_GLOBAL;
     Aim_CARPOSITON_GLOBAL.X_POSITION=X_AIMPOSITION;
@@ -167,6 +195,8 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
         case UnStacking_Correction:
             Send_MissionPack(UnStacking_Correction,Blue);
             ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
+            rk3588_Arry[6]=0x00;
+            LED_ONOFF(LED1,1);
             while (rk3588_Arry[6]!=0x03)
             {
                 if(rk3588_Arry[6]==0x01)
@@ -179,9 +209,18 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
                     rk3588_Arry[6]=0x00;
                 }
             }
-            Send_MissionPack(UnStacking_Correction,Blue);
-            ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition-100,Claw_ReleaseFull,700,500);
+            LED_ONOFF(LED1,0);
             rk3588_Arry[6]=0x00;
+            ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition-100,Claw_ReleaseFull,700,500);
+            while (rk3588_Arry[6]!=0x01)
+            {
+                LED_ONOFF(LED1,1);
+                HAL_Delay(300);
+                Send_MissionPack(UnStacking_Correction,Blue);
+            }
+            LED_ONOFF(LED1,0);
+            rk3588_Arry[6]=0x00;
+            LED_ONOFF(LED1,1);
             while (rk3588_Arry[6]!=0x03)
             {
                 if(rk3588_Arry[6]==0x01)
@@ -195,15 +234,14 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
                     CarMove_TO_Relative(None_CARPOSITION,CompensationAim_Pose,VOID_FUNCTION);
                     rk3588_Arry[6]=0x00;
                 }
-                LED_ONOFF(LED2,1);
             }
-            LED_ONOFF(LED2,0);
-            LED_ONOFF(LED1,1);
+            LED_ONOFF(LED1,0);
             Send_MissionPack(9,Blue);
             return HAL_OK;
         case Stacking_Correction:
             Send_MissionPack(Stacking_Correction,Green);
             ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_ReleaseFull,700,500);
+            rk3588_Arry[6]=0x00;
             while (rk3588_Arry[6]!=0x03)
             {
                 if(rk3588_Arry[6]==0x01)
@@ -219,8 +257,10 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
             return HAL_OK;
         case Angle_compensation:
             Send_MissionPack(Angle_compensation,Green);
+            rk3588_Arry[6]=0x00;
             while (rk3588_Arry[5]!=0x03)
             {
+                Gyroscopes_ARRAY_Handle();
                 if(rk3588_Arry[5]==0x01)
                 {
                     Motor_PositionControl_UART(Motor1,rk3588_Arry[4] == 0 ? Motor_Forward : Motor_Backward,10,0,10*rk3588_Arry[2]+rk3588_Arry[3]);
@@ -232,7 +272,7 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
                 }
             }
             MOTOR_Stop();
-            // Target_angle = angle;
+            Target_angle = angle;
             return HAL_OK;
         case Raw_Material_Compensation:
             Send_MissionPack(Raw_Material_Compensation,1);
@@ -408,5 +448,5 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
  * @brief Just to VOID_FUNCTION
  *  
  */
-HAL_StatusTypeDef VOID_FUNCTION(float AIM_XPosition,float AIM_YPosition,float AIM_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time){return HAL_OK;}
+HAL_StatusTypeDef VOID_FUNCTION(float AIM_XPosition,float AIM_YPosition,float AIM_ZPosition){return HAL_OK;}
 

@@ -552,6 +552,21 @@ void Gyroscopes_ARRAY_Handle(void)
 { 
 	if(Turban2_Index!=12)
 	{Raw_angle=(float)((Gyroscopes_ARRAY[(Turban2_Index+6)%10]<<8)|Gyroscopes_ARRAY[(Turban2_Index+5)%10])/32768.0f*180.0f;}
+  Delta_angle=Raw_angle-prev_angle;
+  if(Delta_angle>=180.0f)
+	{
+		Delta_angle-=360.0f;
+	}
+	else if(Delta_angle<=-180.0f)
+	{
+		Delta_angle+=360.0f;
+	}
+	angle+=Delta_angle;
+  prev_angle=angle;
+  Err_Angle_Past=Err_Angle;
+	Err_Angle=angle-Target_angle;
+
+  /*//Directly Angle
   if(Raw_angle>180)
   {
     angle=Raw_angle-360;
@@ -560,10 +575,12 @@ void Gyroscopes_ARRAY_Handle(void)
   prev_angle=angle;
   Err_Angle_Past=Err_Angle;
   Err_Angle=angle-Target_angle;
+  */
+	
 	
 //	Send_Number(Turban2_Index,55);
 //	HAL_UART_Transmit(&huart4,(const uint8_t*)Gyroscopes_ARRAY,11,0xFF);
 //	HAL_UART_Transmit(&huart4,(const uint8_t*)HWT101_OringalData,11,0xFF);
-//	Send_Number(angle,55);
+	// Send_Number(angle,55);
 }
 /* USER CODE END 1 */

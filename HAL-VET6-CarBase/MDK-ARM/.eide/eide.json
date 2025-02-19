@@ -59,6 +59,12 @@
                   },
                   {
                     "path": "../Core/Src/OLED.c"
+                  },
+                  {
+                    "path": "../Core/Src/Function.c"
+                  },
+                  {
+                    "path": "../Core/Src/Motor_Carbase_Special.c"
                   }
                 ],
                 "folders": []

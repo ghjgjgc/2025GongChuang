@@ -10,22 +10,22 @@ const float Bigarm_Length=120.0;
 
 const float Bigarm_UpwardAngle=103.0;
 const float Forearm_UptwardAngle=65.0;
-const float Base_GreenAngle=39;
+const float Base_GreenAngle=47.5;
 
 const float Raw_Material_Area_Height=160.0f;
 
-const ROBOTICArm_Pose Raw_Material_Scanning={-160,0,220,Claw_Clawing};
+const ROBOTICArm_Pose Raw_Material_Scanning={-160,8,220,Claw_Clawing};
 const ROBOTICArm_Pose Raw_Material_ClawFront={-155,0,135,Claw_Clawing};
-const ROBOTICArm_Pose Raw_Material_ClawLeft={-310,-60,135,Claw_Clawing};
-const ROBOTICArm_Pose Raw_Material_ClawRight={-300,80,135,Claw_Clawing};
+const ROBOTICArm_Pose Raw_Material_ClawLeft={-320,-30,135,Claw_Clawing};
+const ROBOTICArm_Pose Raw_Material_ClawRight={-305,85,135,Claw_Clawing};
 
-const ROBOTICArm_Pose Blue_Warehouse={160,90,150,Claw_Clawing};
-const ROBOTICArm_Pose Green_Warehouse={165,5,150,Claw_Clawing};
-const ROBOTICArm_Pose Red_Warehouse={165,-80,150,Claw_Clawing};
+const ROBOTICArm_Pose Blue_Warehouse={165,80,145,Claw_Clawing};
+const ROBOTICArm_Pose Green_Warehouse={168,5,145,Claw_Clawing};
+const ROBOTICArm_Pose Red_Warehouse={165,-80,145,Claw_Clawing};
 
-const ROBOTICArm_Pose Blue_PlacementLocation_Unstack={-115,205,75,Claw_Clawing};
-const ROBOTICArm_Pose Green_PlacementLocation_Unstack={15,205,75,Claw_Clawing};
-const ROBOTICArm_Pose Red_PlacementLocation_Unstack={155,215,75,Claw_Clawing};
+const ROBOTICArm_Pose Blue_PlacementLocation_Unstack={-130,213,72,Claw_Clawing};
+const ROBOTICArm_Pose Green_PlacementLocation_Unstack={5,210,72,Claw_Clawing};
+const ROBOTICArm_Pose Red_PlacementLocation_Unstack={140,213,72,Claw_Clawing};
 
 const ROBOTICArm_Pose Blue_PlacementLocation_stack={180,70,150,Claw_Clawing};
 const ROBOTICArm_Pose Green_PlacementLocation_stack={170,0,150,Claw_Clawing};
@@ -33,7 +33,7 @@ const ROBOTICArm_Pose Red_PlacementLocation_stack={180,-85,150,Claw_Clawing};
 
 const ROBOTICArm_Pose Relay_point={0,200,240,Claw_Clawing};
 
-ROBOTICArm_Pose Initial_state={0,200,200,Claw_Clawing};
+ROBOTICArm_Pose Initial_state={0,200,200,Claw_Release};
 ROBOTICArm_Pose Past_state={0,200,200,Claw_Release};
 ROBOTICArm_Pose Current_state={0,200,200,Claw_Release};
 ROBOTICArm_Pose Final_state={0,200,200,Claw_Release};
@@ -46,7 +46,7 @@ ROBOTICArm_Pose Final_state={0,200,200,Claw_Release};
  * @param Claw_Control Mechanical jaw status
  * @return HAL_StatusTypeDef Succ or Fail
  */
-HAL_StatusTypeDef ROBOTICArm_Coordinate_Calculation(float AIM_XPosition,float AIM_YPosition,float AIM_ZPosition,Claw_Status Claw_Control)
+HAL_StatusTypeDef ROBOTICArm_Coordinate_Calculation(float AIM_XPosition,float AIM_YPosition,float AIM_ZPosition)
 {
     /*Coordinate compensation*/
     AIM_XPosition+=0;
@@ -90,7 +90,6 @@ HAL_StatusTypeDef ROBOTICArm_Coordinate_Calculation(float AIM_XPosition,float AI
         SERVO_AngleSet(SERVO_Base,Base_Angle);
         SERVO_AngleSet(SERVO_BigArm,(Bigarm_UpwardAngle+180-Big_ArmAngle));
         SERVO_AngleSet(SERVO_ForeArm,(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180)));
-        SERVO_ClawSet(Claw_Control);
         return HAL_OK;
     }
     else return HAL_ERROR;
@@ -105,25 +104,10 @@ void ROBOTICArm_initialize(void)
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_4);
-    ROBOTICArm_Coordinate_Calculation(Initial_state.XPosition,Initial_state.YPosition,Initial_state.ZPosition,Initial_state.Claw_Control);
-
+    ROBOTICArm_Coordinate_Calculation(Initial_state.XPosition,Initial_state.YPosition,Initial_state.ZPosition);
+    SERVO_ClawSet(Initial_state.Claw_Control);
     Current_state=Initial_state;
     Past_state=Initial_state;
-}
-/**
- * @brief Set Final_Pose
- * 
- * @param Final_XPosition  Final_XPosition
- * @param Final_YPosition  Final_YPosition
- * @param Final_ZPosition  Final_ZPosition
- * @param Claw_Control FinalClaw_Control
- */
-void Final_PoseSet(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control)
-{
-    Final_state.XPosition=Final_XPosition;
-    Final_state.YPosition=Final_YPosition;
-    Final_state.ZPosition=Final_ZPosition;
-    Final_state.Claw_Control=Claw_Control;
 }
 /**
  * @brief Linear interpolation of the robotic arm.
@@ -135,7 +119,7 @@ void Final_PoseSet(float Final_XPosition,float Final_YPosition,float Final_ZPosi
  * @param Delay_Time Delay_Time
  * @return HAL_StatusTypeDef Busy or OK
  */
-HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time)
+HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm_Moving(float Final_XPosition,float Final_YPosition,float Final_ZPosition)
 {
     /*normal variable*/
     const float epsilon = 1e-3;
@@ -143,14 +127,16 @@ HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm(float Final_XPosition,
     static uint16_t FeedCNT=0;
 	static float LinearX_variation,LinearY_variation,LinearZ_variation;
 	static float FeedAmount,Step_X,Step_Y,Step_Z;
+    const uint16_t StartEndCNT=30;
 
     switch (linearInterpolationAlgorithm_state)
     {
         case 0:
-            //initialize variable
-            Final_PoseSet(Final_XPosition,Final_YPosition,Final_ZPosition,Claw_Control);
             //Refresh state
             Current_state=Past_state;
+            Final_state.XPosition=Final_XPosition;
+            Final_state.YPosition=Final_YPosition;
+            Final_state.ZPosition=Final_ZPosition;
 
             LinearX_variation=Final_state.XPosition-Past_state.XPosition;
             LinearY_variation=Final_state.YPosition-Past_state.YPosition;
@@ -173,25 +159,32 @@ HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm(float Final_XPosition,
             Current_state.ZPosition += Step_Z;
             FeedCNT++;
 
-            ROBOTICArm_Coordinate_Calculation(Current_state.XPosition,Current_state.YPosition,Current_state.ZPosition,Past_state.Claw_Control);
-            // HAL_Delay(1);
+            ROBOTICArm_Coordinate_Calculation(Current_state.XPosition,Current_state.YPosition,Current_state.ZPosition);
+
             if(FeedCNT>FeedAmount||(fabsf(Current_state.XPosition - Final_state.XPosition) < epsilon &&fabsf(Current_state.YPosition - Final_state.YPosition) < epsilon &&fabsf(Current_state.ZPosition - Final_state.ZPosition) < epsilon))
             {
-                ROBOTICArm_Coordinate_Calculation(Final_state.XPosition,Final_state.YPosition,Final_state.ZPosition,Past_state.Claw_Control);//due to float
-                HAL_Delay(GoTO_Delay_Time);
-                SERVO_ClawSet(Claw_Control);
-                HAL_Delay(Claw_Delay_Time);
+                ROBOTICArm_Coordinate_Calculation(Final_state.XPosition,Final_state.YPosition,Final_state.ZPosition);//due to float
                 linearInterpolationAlgorithm_state=0; 
                 FeedCNT=0;
                 Past_state=Final_state;
-                
                 LED_ONOFF(LED4,0);
                 return HAL_OK;
             }
+            if(FeedCNT <= StartEndCNT || FeedCNT >= FeedAmount - StartEndCNT)
+                Self_Delay(150);
+            else Self_Delay(10);
+
             return HAL_BUSY;
         default:
             return HAL_OK;
     }
+}
+HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t Claw_Delay_Time)
+{
+    while(ROBOTICArm_linearInterpolationAlgorithm_Moving(Final_XPosition,Final_YPosition,Final_ZPosition)!=HAL_OK);
+    SERVO_ClawSet(Claw_Control);
+    HAL_Delay(Claw_Delay_Time);
+    return HAL_OK;
 }
 /**
  * @brief Direct movement of the robotic arm
@@ -205,16 +198,10 @@ HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm(float Final_XPosition,
  */
 HAL_StatusTypeDef ROBOTICArm_DirectlyMove(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time )
 {
-    ROBOTICArm_Coordinate_Calculation(Final_XPosition,Final_YPosition,Final_ZPosition,Past_state.Claw_Control);//due to float
-    
+    ROBOTICArm_Coordinate_Calculation(Final_XPosition,Final_YPosition,Final_ZPosition);//due to float
 	HAL_Delay(GoTO_Delay_Time);
     SERVO_ClawSet(Claw_Control);
     HAL_Delay(Claw_Delay_Time);
-
-    // Final_state.XPosition=Final_XPosition;
-    // Final_state.YPosition=Final_YPosition;
-    // Final_state.ZPosition=Final_ZPosition;
-    // Final_state.Claw_Control=Claw_Control;
 
     Current_state.XPosition=Final_XPosition;
     Current_state.YPosition=Final_YPosition;
