@@ -58,15 +58,23 @@
                     "path": "../Core/Src/ROBOTIC_Arm.c"
                   },
                   {
-                    "path": "../Core/Src/OLED.c"
-                  },
-                  {
                     "path": "../Core/Src/Function.c"
                   },
                   {
                     "path": "../Core/Src/Motor_Carbase_Special.c"
+                  },
+                  {
+                    "path": "../Core/Src/oled.c"
+                  },
+                  {
+                    "path": "../Core/Src/Motor_CarBase_Simple.c"
                   }
                 ],
+                "folders": []
+              },
+              {
+                "name": "Inc",
+                "files": [],
                 "folders": []
               }
             ]
@@ -158,7 +166,9 @@
   },
   "targets": {
     "HAL-VET6-CarBase": {
-      "excludeList": [],
+      "excludeList": [
+        "<virtual_root>/Application/User/Inc"
+      ],
       "toolchain": "AC5",
       "compileConfig": {
         "cpuType": "Cortex-M4",

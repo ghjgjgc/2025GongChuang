@@ -59,8 +59,9 @@ class Uart:
     def uart_send_order(self, order1, order2, order3, order4, order5, order6):
         self.uart_head(QR_code,order1, order2, order3, order4, order5, order6)
 
-    def uart_send_yes(self,fn=0x03,color=0):
-        self.uart_head(1,0x03,0x03,0x03,0x03,fn,color)
+    def uart_send_yes(self,fn=0x03,color=0x03):
+        global global_task
+        self.uart_head(global_task,0,0,0,0,fn,color)
 
     def uart_send_command(self, param1, param2, param3, param4, fn=0x01,color=0):
         self.uart_head(1,param1, param2, param3, param4, fn,color)
@@ -72,13 +73,13 @@ class Uart:
         dx = int(dx)
         dy = int(dy)
         if abs(dy) > 255:
-            dy = 255 * 1 if dy >= 0 else -1
+            dy = 255 * 1 if dy > 0 else -1
         if abs(dx) > 255:
-            dx = 255 * 1 if dx >= 0 else -1
+            dx = 255 * 1 if dx > 0 else -1
         if abs(dx) < dx_threshold and abs(dy) < dy_threshold:
             dy=int(dy * Magnification)
             dx=int(dx * Magnification)
-            self.uart_send_command(param1=abs(dy),param2=abs(dx), param3 = 0 if dy >= 0 else 1, param4=0 if dx >= 0 else 1, fn=0x03,color=color)
+            self.uart_send_command(param1=abs(dy),param2=abs(dx), param3 = 0 if dy >= 0 else 1, param4=0 if dx >= 0 else 1, fn=0x01,color=color)
             return True
         else:
             dy=int(dy * Magnification)

@@ -39,7 +39,7 @@ extern UART_HandleTypeDef huart5;
 extern UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN Private defines */
-typedef enum{Motor_Forward=0x00,Motor_Backward=0x01}Motor_DIRECTION;
+typedef enum{Motor_Forward,Motor_Backward}Motor_DIRECTION;
 typedef enum{Motor1=1,Motor2=2,Motor3=3,Motor4=4}Motor_ID;
 #define UARTTest 0
 /* USER CODE END Private defines */
@@ -49,14 +49,16 @@ void MX_UART5_Init(void);
 void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-extern float Target_angle,angle,Err_Angle,Err_Angle_Past;
+extern float Target_angle,angle,Err_Angle,Err_Angle_Past,Raw_angle;
+extern uint8_t Turban1_Index,Turban2_Index;
 void MOTOR_SendMultipleStart(void);
-HAL_StatusTypeDef Motor_SpeedControl_UART(Motor_ID Motor_ID, Motor_DIRECTION Direction, uint32_t Speed,uint8_t Accleration);
-HAL_StatusTypeDef Motor_PositionControl_UART(Motor_ID Motor_ID, Motor_DIRECTION Direction, uint32_t Speed,uint8_t Accleration,uint64_t PluseNum);
+HAL_StatusTypeDef Motor_SpeedControl_UART(Motor_ID Motor_ID, Motor_DIRECTION Direction, float Speed,uint8_t Accleration);
+HAL_StatusTypeDef Motor_PositionControl_UART(Motor_ID Motor_ID, Motor_DIRECTION Direction, float Speed,uint8_t Accleration,uint64_t PluseNum);
 void Send_MissionPack(uint8_t MissionCode,uint8_t Color);
 void MOTOR_Stop(void);
 void Send_Number(int32_t Number,uint8_t Length);
-void Gyroscopes_ARRAY_Handle(void);
+void Send_Byte(uint8_t Byte);
+HAL_StatusTypeDef Gyroscopes_ARRAY_Handle(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

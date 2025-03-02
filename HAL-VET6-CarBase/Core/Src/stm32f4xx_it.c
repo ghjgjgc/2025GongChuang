@@ -64,7 +64,8 @@ extern DMA_HandleTypeDef hdma_usart1_tx;
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart5;
 /* USER CODE BEGIN EV */
-
+extern uint8_t Turban2_Index;
+void Gyroscopes_ARRAY_Handle(void);
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -215,7 +216,6 @@ void DMA1_Stream0_IRQHandler(void)
   /* USER CODE END DMA1_Stream0_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_uart5_rx);
   /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
-  
   /* USER CODE END DMA1_Stream0_IRQn 1 */
 }
 

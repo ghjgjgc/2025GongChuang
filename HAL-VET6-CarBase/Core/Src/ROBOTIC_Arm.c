@@ -14,7 +14,7 @@ const float Base_GreenAngle=47.5;
 
 const float Raw_Material_Area_Height=160.0f;
 
-const ROBOTICArm_Pose Raw_Material_Scanning={-160,8,220,Claw_Clawing};
+const ROBOTICArm_Pose Raw_Material_Scanning={-160,0,220,Claw_Clawing};
 const ROBOTICArm_Pose Raw_Material_ClawFront={-155,0,135,Claw_Clawing};
 const ROBOTICArm_Pose Raw_Material_ClawLeft={-320,-30,135,Claw_Clawing};
 const ROBOTICArm_Pose Raw_Material_ClawRight={-305,85,135,Claw_Clawing};
@@ -23,15 +23,17 @@ const ROBOTICArm_Pose Blue_Warehouse={165,80,145,Claw_Clawing};
 const ROBOTICArm_Pose Green_Warehouse={168,5,145,Claw_Clawing};
 const ROBOTICArm_Pose Red_Warehouse={165,-80,145,Claw_Clawing};
 
-const ROBOTICArm_Pose Blue_PlacementLocation_Unstack={-130,213,72,Claw_Clawing};
-const ROBOTICArm_Pose Green_PlacementLocation_Unstack={5,210,72,Claw_Clawing};
-const ROBOTICArm_Pose Red_PlacementLocation_Unstack={140,213,72,Claw_Clawing};
+const ROBOTICArm_Pose Place_Scaning={-6,210,190,Claw_Clawing};
 
-const ROBOTICArm_Pose Blue_PlacementLocation_stack={180,70,150,Claw_Clawing};
-const ROBOTICArm_Pose Green_PlacementLocation_stack={170,0,150,Claw_Clawing};
-const ROBOTICArm_Pose Red_PlacementLocation_stack={180,-85,150,Claw_Clawing};
+const ROBOTICArm_Pose Blue_PlacementLocation_Unstack={-136,220,70,Claw_Clawing};
+const ROBOTICArm_Pose Green_PlacementLocation_Unstack={-2,225.5,70,Claw_Clawing};
+const ROBOTICArm_Pose Red_PlacementLocation_Unstack={137,230,70,Claw_Clawing};
 
-const ROBOTICArm_Pose Relay_point={0,200,240,Claw_Clawing};
+const ROBOTICArm_Pose Blue_PlacementLocation_stack={-122,213,130,Claw_Clawing};
+const ROBOTICArm_Pose Green_PlacementLocation_stack={10,210,130,Claw_Clawing};
+const ROBOTICArm_Pose Red_PlacementLocation_stack={150,216,130,Claw_Clawing};
+
+const ROBOTICArm_Pose Relay_point={-11.5,200,240,Claw_Clawing};
 
 ROBOTICArm_Pose Initial_state={0,200,200,Claw_Release};
 ROBOTICArm_Pose Past_state={0,200,200,Claw_Release};

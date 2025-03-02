@@ -36,6 +36,7 @@ extern "C" {
 #include <stdio.h>  
 #include <stdlib.h> 
 #include <string.h>
+#include "OLED.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -81,9 +82,10 @@ typedef struct {
 }ROBOTICArm_Pose;
 
 #define PI 3.141592653589793f
+#define SpecialONOFF 0
 extern uint8_t DEBUG_USART[];
 typedef enum{Yes=1,No=0}Variable_Flag;
-#define Rotation_direction  0 //1为�?�时针，-1为顺时针
+#define Rotation_direction  0
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

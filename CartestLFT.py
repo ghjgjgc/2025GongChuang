@@ -7,7 +7,7 @@ from Uart_GXS2025LFT import *
 import threading
 
 
-
+WaitCNT=2
 
 # rknn_wk = rknn.rknn(r"/home/radxa/Desktop/demo_python/wk.rknn", 0.5, 0.5)
 # rknn_sz = rknn.rknn(r"/home/radxa/Desktop/demo_python/sz.rknn", 0.5, 0.5)
@@ -136,9 +136,9 @@ class Eyes_task(fundation):
     def task1(self):
         """原料区夹取"""
         # 变量创建
-        global img, ret, cam_process,global_task,global_color
+        global img, ret, cam_process,global_task,global_color,WaitCNT
         preX, preY = 0, 0
-        Movement_threshold = 3 #移动的阈值
+        Movement_threshold = 5 #移动的阈值
         dx_threshold = 50
         dy_threshold = 300
         # 若任务为1，即未发送停止指令
@@ -160,15 +160,16 @@ class Eyes_task(fundation):
 
     def task2(self):
         """粗调细调"""
-        global img, ret, cam_process, global_task , global_color
+        global img, ret, cam_process, global_task , global_color,WaitCNT
         if global_color == Green:
             global_color = Blue
         elif global_color == Blue:
             global_color = Green
         # 开辟变量
         flagcount = 0
-        dx1_threshold = 30
-        dy1_threshold = 30
+        WaitCount = 0
+        dx1_threshold = 50
+        dy1_threshold = 50
         dx2_threshold = 25
         dy2_threshold = 25
         # 第一次纠正
@@ -181,64 +182,74 @@ class Eyes_task(fundation):
                 flagxy = uart.car_move_xy_cm(dx, dy, dx1_threshold, dy1_threshold)
                 if flagxy: # 如果达到临界值,发送五次最后参数？
                     flagcount += 1
-                    time.sleep(0.2)
+                    flagxy = uart.car_move_xy_cm(dx, dy, dx1_threshold, dy1_threshold,Magnification = 0.5)
                 else:
                     flagcount=0
-                if flagcount >= 3:
+                if flagcount >= 1:
+                    print("第一次校准完成")
+                    global_color = Green
                     uart.uart_send_yes()
                     flagcount = 0
                     break
         #等待机械臂移动
-        cv2.waitKey(500)
+        while global_color != Blue:
+            time.sleep(0.1)
+            uart.uart_send_yes()
+            continue
+        flagcount = 0
         while global_task == UnStacking_Correction: # 绿色和蓝色反了
             boxs, scores, classes = rknn2.rknn_detect(img, Blue)
             if ret is False or img is None or scores is None:
                 continue
             if scores > 0.50 and classes == Blue:
                 dx, dy, centerx, centery = self.find_center(boxs)
-                flagxy = uart.car_move_xy_cm(dx, dy, dx2_threshold, dy2_threshold,Magnification = 0.8)
+                flagxy = uart.car_move_xy_cm(dx, dy, dx2_threshold, dy2_threshold,Magnification = 0.3)
                 if flagxy:  # 如果达到临界值,发送五次最后参数？
                     flagcount += 1
-                    time.sleep(0.2)
+                    #boxs, scores, classes = rknn2.rknn_detect(img, Blue)
                 else:
                     flagcount = 0
-                if flagcount >= 3:
+                if flagcount >= 8:
+                    print("第二次校准完成")
                     uart.uart_send_yes()
                     break
+        while global_task == UnStacking_Correction:
+            time.sleep(0.1)
+            uart.uart_send_yes()
+        global_task = None
 
     def task3(self,):
         """暂存区堆叠用 """
-        global img, ret, cam_process, global_task,global_color
+        global img, ret, cam_process, global_task,global_color,WaitCNT
         # 变量
         flagcount = 0
-        dx1_threshold = 10
-        dy1_threshold = 10
+        WaitCount=0
+        dx1_threshold = 20
+        dy1_threshold = 20
         # 第一次纠正
         while global_task == Stacking_Correction:
-            boxs, scores, classes = rknn2.rknn_detect(img, global_color)
+            boxs, scores, classes = rknn2.rknn_detect(img, Blue)
             if ret is False or img is None or scores is None:
                 continue
-            if scores > 0.50 and classes == global_color:
+            if scores > 0.50 and classes == Blue:
                 dx, dy, centerx, centery = self.find_center(boxs)
                 flagxy = uart.car_move_xy_cm(dx, dy, dx1_threshold, dy1_threshold)
                 if flagxy:  # 如果达到临界值,发送五次最后参数？
                     flagcount += 1
-                    time.sleep(0.2)
+                    boxs, scores, classes = rknn2.rknn_detect(img, Blue)
                 else:
                     flagcount = 0
                 if flagcount >= 3:
-                    uart.uart_send_yes()
-                    uart.uart_send_yes()
                     uart.uart_send_yes()
                     break
 
     def task4(self):
         """原料区误差纠正"""
-        global img, ret, cam_process, global_task,global_color
+        global img, ret, cam_process, global_task,global_color,WaitCNT
         # 变量
-        Distance_threshold = 10
-        dx1_threshold = 40
-        dy1_threshold = 40
+        Distance_threshold = 13
+        dx1_threshold = 50
+        dy1_threshold = 50
         preX = 0
         preY = 0
         centerx = 0
@@ -263,20 +274,26 @@ class Eyes_task(fundation):
                     preX = centerx
                     preY = centery
                     continue
-                flagxy = uart.car_move_xy_cm(dx, dy+100, dx1_threshold, dy1_threshold, color=classes)
+                flagxy = uart.car_move_xy_cm(dx, dy+100, dx1_threshold, dy1_threshold, color=classes,Magnification = 0.5)
                 if flagxy:
                     flagcount += 1
                 else:
                     flagcount = 0
-                if flagcount >= 20:
+                if flagcount >= 3:
+                    uart.uart_send_yes()
                     break
-            preX = centerx
-            preY = centery
+        while global_task == Raw_Material_Correction:
+            uart.uart_send_yes()
+            time.sleep(0.4)
+        time.sleep(0.4)
+        preX = centerx
+        preY = centery
 
     def task5(self):
         """角度修正"""
-        global img, ret, cam_process, global_task,global_color
+        global img, ret, cam_process, global_task,global_color,WaitCNT
         flagcount = 0
+        WaitCount=0
         while global_task == Angle_Correction:
             if not ret or img is None or global_color==0: # 0 代表32忙中，还没完成移动
                 continue
@@ -287,7 +304,7 @@ class Eyes_task(fundation):
                 else:
                     uart.uart_send_angle(abs(X), abs(Y), 0 if Y > 0 else 1, 0x01)
                     flagcount = 0
-                if flagcount >= 3:
+                if flagcount >= 40:
                     uart.uart_send_angle(0x00, 0x00, 0x00, 0x03)
                     break
 
@@ -324,7 +341,7 @@ if __name__ == "__main__":
     cam_threading.start()
 
     # 二维码扫描
-    Cam2_Do.qr_obtain()
+    #Cam2_Do.qr_obtain()
 
     while True:
         if global_task == Raw_Material_Scanning:

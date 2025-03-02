@@ -21,9 +21,7 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-uint8_t Gyroscopes_ARRAY[11],HWT101_OringalData[11];
-float Gyroscopes_ERRARRAY[5];
-uint8_t rk3588_Arry[9]={0x00,0x67,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+uint8_t Gyroscopes_ARRAY[11],HWT101_OringalData[11],rk3588_OringalData[9],rk3588_Arry[9]={0x00,0x67,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart4;
@@ -173,7 +171,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     __HAL_LINKDMA(uartHandle,hdmarx,hdma_uart4_rx);
 
     /* UART4 interrupt Init */
-    HAL_NVIC_SetPriority(UART4_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(UART4_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(UART4_IRQn);
   /* USER CODE BEGIN UART4_MspInit 1 */
 
@@ -409,11 +407,15 @@ void Send_Number(int32_t Number,uint8_t Length)
   uint8_t i=0;
   if(Number<0)
   {
-    Send_Byte(9 + '0');
+    Send_Byte(0x2D);
+  }
+  else
+  {
+    Send_Byte(0x2B);
   }
   for(i=0;i<Length;i++)
   {
-    Send_Byte(abs(Number) / Serial_Pow(10, Length - i - 1) % 10 + '0');
+    Send_Byte(abs((int32_t)Number) / Serial_Pow(10, Length - i - 1) % 10 + '0');
   }
 }
 uint8_t MOTOR_UARTPACK_SpeedControl[]={0x01/*Address*/,0xF6/*Mission_Identifier*/,
@@ -430,19 +432,20 @@ uint8_t SpeedControl_ReceivePACK[4]={0x00,0x00,0x00,0x00};
  * @param Accleration uint8_t,0 to 255 , 0 mean Start immediately
  * @return HAL_StatusTypeDef 
  */
-HAL_StatusTypeDef Motor_SpeedControl_UART(Motor_ID Motor_ID, Motor_DIRECTION Direction, uint32_t Speed,uint8_t Accleration)
+HAL_StatusTypeDef Motor_SpeedControl_UART(Motor_ID Motor_ID, Motor_DIRECTION Direction, float Speed,uint8_t Accleration)
 {
   if(Speed>=6000)Speed=6000;
   MOTOR_UARTPACK_SpeedControl[0]=Motor_ID;
   MOTOR_UARTPACK_SpeedControl[2]=Direction;
-  MOTOR_UARTPACK_SpeedControl[3]=(Speed>>8)&0xFF;
-  MOTOR_UARTPACK_SpeedControl[4]=Speed&0xFF;
+  MOTOR_UARTPACK_SpeedControl[3]=((uint32_t)Speed>>8)&0xFF;
+  MOTOR_UARTPACK_SpeedControl[4]=(uint32_t)Speed&0xFF;
   MOTOR_UARTPACK_SpeedControl[5]=Accleration;
   HAL_UART_Transmit(&huart1,(const uint8_t*)MOTOR_UARTPACK_SpeedControl,8,0xff);
+  Self_Delay(10);
   #if UARTTest==0
-  HAL_UART_Receive(&huart1,(uint8_t*)SpeedControl_ReceivePACK,4,0xff);
+  // HAL_UART_Receive(&huart1,(uint8_t*)SpeedControl_ReceivePACK,4,0xff);
   #else
-  // HAL_UART_Transmit(&huart4,(const uint8_t*)MOTOR_UARTPACK_SpeedControl,8,0xff);
+  HAL_UART_Transmit(&huart4,(const uint8_t*)MOTOR_UARTPACK_SpeedControl,8,0xff);
   #endif
   if (SpeedControl_ReceivePACK[3]==0xE2)
   {
@@ -467,20 +470,21 @@ uint8_t PositionControl_ReceivePACK[4]={0x00,0x00,0x00,0x00};
  * @param PluseNum uint64_t , 0 to 4294967295
  * @return HAL_StatusTypeDef 
  */
-HAL_StatusTypeDef Motor_PositionControl_UART(Motor_ID Motor_ID, Motor_DIRECTION Direction, uint32_t Speed,uint8_t Accleration,uint64_t PluseNum)
+HAL_StatusTypeDef Motor_PositionControl_UART(Motor_ID Motor_ID, Motor_DIRECTION Direction, float Speed,uint8_t Accleration,uint64_t PluseNum)
 {
     MOTOR_UARTPACK_PositionControl[0]=Motor_ID;
     MOTOR_UARTPACK_PositionControl[2]=Direction;
-    MOTOR_UARTPACK_PositionControl[3]=(Speed>>8)&0xFF;
-    MOTOR_UARTPACK_PositionControl[4]=Speed&0xFF;
+    MOTOR_UARTPACK_PositionControl[3]=((uint32_t)Speed>>8)&0xFF;
+    MOTOR_UARTPACK_PositionControl[4]=(uint32_t)Speed&0xFF;
     MOTOR_UARTPACK_PositionControl[5]=Accleration;
     MOTOR_UARTPACK_PositionControl[6]=PluseNum>>24&0xFF; 
     MOTOR_UARTPACK_PositionControl[7]=PluseNum>>16&0xFF;
     MOTOR_UARTPACK_PositionControl[8]=PluseNum>>8&0xFF;
     MOTOR_UARTPACK_PositionControl[9]=PluseNum&0xFF;
     HAL_UART_Transmit(&huart1,(const uint8_t*)MOTOR_UARTPACK_PositionControl,13,0xff);
+    Self_Delay(10);
     #if UARTTest==0
-    HAL_UART_Receive(&huart1,(uint8_t*)PositionControl_ReceivePACK,4,0xff);
+    // HAL_UART_Receive(&huart1,(uint8_t*)PositionControl_ReceivePACK,4,0xff);
     #else
     HAL_UART_Transmit(&huart4,(const uint8_t*)MOTOR_UARTPACK_PositionControl,13,0xff);
     #endif
@@ -500,6 +504,10 @@ const uint8_t MOTOR_SendMultipleStart_ARRAY[4]={0x00,0xFF,0x66,0x6B};
 void MOTOR_SendMultipleStart(void)
 {
   HAL_UART_Transmit(&huart1,(const uint8_t*)MOTOR_SendMultipleStart_ARRAY,4,0xff);
+  Self_Delay(10);
+	#if UARTTest==1
+	HAL_UART_Transmit(&huart4,(const uint8_t*)MOTOR_SendMultipleStart_ARRAY,4,0xff);
+	#endif
 }
 uint8_t MOTOR_UARTPACK_StopControl[]={0x00/*Address*/,0xFE,0x98/*Mission_Identifier*/,
     0x00/*Multiple_Identiflier*/,0x6B/*CheckSum*/};
@@ -510,6 +518,10 @@ uint8_t MOTOR_UARTPACK_StopControl[]={0x00/*Address*/,0xFE,0x98/*Mission_Identif
 void MOTOR_Stop(void)
 {
 	HAL_UART_Transmit(&huart1,(const uint8_t*)MOTOR_UARTPACK_StopControl,5,0xff);
+  Self_Delay(100);
+	#if UARTTest==1
+	HAL_UART_Transmit(&huart4,(const uint8_t*)MOTOR_UARTPACK_StopControl,5,0xff);
+	#endif
 }
 uint8_t Mission_Pack[4]={0xBB,0x70,0x63,0xCC};
 /**
@@ -524,63 +536,86 @@ void Send_MissionPack(uint8_t MissionCode,uint8_t Color)
   Mission_Pack[2]=Color;
   HAL_UART_Transmit(&huart4,(const uint8_t*)Mission_Pack,4,0xFFFF);
 }
-
 float Target_angle=0,angle=0,prev_angle=0,
   Err_Angle=0,Err_Angle_Past=0,
   Delta_angle=0;
 uint8_t  Turban1_Index=12,Turban2_Index=12;
+HAL_StatusTypeDef Gyroscopes_ARRAY_Handle(void) 
+{ 
+  float Raw_angle=0;
+  Raw_angle=((Gyroscopes_ARRAY[(Turban2_Index+6)%10]<<8)|Gyroscopes_ARRAY[(Turban2_Index+5)%10])*180.0f/32768.0f;
+  
+  //Kang Code
+  Delta_angle=Raw_angle-prev_angle;
+  if(Delta_angle>=180.0f)
+  {
+    Delta_angle-=360.0f;
+  }
+  else if(Delta_angle<=-180.0f)
+  {
+    Delta_angle+=360.0f;
+  }
+  if(fabsf(Delta_angle)>=10)
+  return HAL_ERROR;
+	//return HAL_ERROR;
+  angle+=Delta_angle;
+  Err_Angle_Past=Err_Angle;
+  prev_angle=angle;
+  Err_Angle=angle-Target_angle;
+  
+
+    // //Directly Angle
+    // if(Raw_angle>180)
+    // {
+    //   angle=Raw_angle-360;
+    // }
+    // else angle=Raw_angle;
+    // prev_angle=angle;
+    // Err_Angle_Past=Err_Angle;
+    // Err_Angle=angle-Target_angle;
+  return HAL_OK;
+}
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) 
 { 
   if(huart->Instance==UART5)
   {
-		for (uint8_t i = 0; i < 11; i++)
-		{
-			if (HWT101_OringalData[i]==0x53)
-			{
-				for(uint8_t n=0;n<11;n++)
-				{
-					Gyroscopes_ARRAY[n]=HWT101_OringalData[n];
-				}
-				Turban2_Index=i;
-				break;
-			}
+    if(HWT101_OringalData[Turban2_Index]!=0x53)
+    {
+      for (uint8_t n = 0; n < 11; n++)
+      {
+        if (HWT101_OringalData[n]==0x53)
+        {
+          Turban2_Index=n;
+          for (uint8_t i = 0; i < 11; i++)
+          {
+            Gyroscopes_ARRAY[i]=HWT101_OringalData[i];
+          }
+          break;
+        }
+      }
+    }
+    else
+    {
+      for (uint8_t i = 0; i < 11; i++)
+      {
+        Gyroscopes_ARRAY[i]=HWT101_OringalData[i];
+      }
+    }
+  }
+  else if(huart->Instance==UART4)
+  {
+    if(rk3588_Arry[Turban1_Index]!=0xFF)
+    {
+      for (uint8_t i = 0; i < 9; i++)
+      {
+        if (rk3588_Arry[i]==0xFF)
+        {
+          Turban1_Index=i;
+          break;
+        }
+      }
     }
   }
 }
-float Raw_angle=0;
-void Gyroscopes_ARRAY_Handle(void) 
-{ 
-	if(Turban2_Index!=12)
-	{Raw_angle=(float)((Gyroscopes_ARRAY[(Turban2_Index+6)%10]<<8)|Gyroscopes_ARRAY[(Turban2_Index+5)%10])/32768.0f*180.0f;}
-  Delta_angle=Raw_angle-prev_angle;
-  if(Delta_angle>=180.0f)
-	{
-		Delta_angle-=360.0f;
-	}
-	else if(Delta_angle<=-180.0f)
-	{
-		Delta_angle+=360.0f;
-	}
-	angle+=Delta_angle;
-  prev_angle=angle;
-  Err_Angle_Past=Err_Angle;
-	Err_Angle=angle-Target_angle;
 
-  /*//Directly Angle
-  if(Raw_angle>180)
-  {
-    angle=Raw_angle-360;
-  }
-  else angle=Raw_angle;
-  prev_angle=angle;
-  Err_Angle_Past=Err_Angle;
-  Err_Angle=angle-Target_angle;
-  */
-	
-	
-//	Send_Number(Turban2_Index,55);
-//	HAL_UART_Transmit(&huart4,(const uint8_t*)Gyroscopes_ARRAY,11,0xFF);
-//	HAL_UART_Transmit(&huart4,(const uint8_t*)HWT101_OringalData,11,0xFF);
-	// Send_Number(angle,55);
-}
 /* USER CODE END 1 */
