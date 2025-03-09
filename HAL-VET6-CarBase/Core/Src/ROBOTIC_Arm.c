@@ -1,8 +1,37 @@
 #include "ROBOTIC_Arm.h"
 /*Setting*/
 #define Insurance_set 1
-#define linearInterpolationAlgorithm_StepNum 10.0f
+#define Raw_Material_Area_Height 135
+#define WareHouseHeight 145
+#define UnstackHeight 70
+#define StackHeight 130
 /*Storage of underlying data*/
+const ROBOTICArm_Pose Raw_Material_Scanning={-165,0,220};
+const ROBOTICArm_Pose Raw_Material_ClawFront={-115,0,Raw_Material_Area_Height};
+const ROBOTICArm_Pose Raw_Material_ClawLeft={-320,-30,Raw_Material_Area_Height};
+const ROBOTICArm_Pose Raw_Material_ClawRight={-312.5,80,Raw_Material_Area_Height};
+
+const ROBOTICArm_Pose Blue_Warehouse={165,80,WareHouseHeight};
+const ROBOTICArm_Pose Green_Warehouse={168,5,WareHouseHeight};
+const ROBOTICArm_Pose Red_Warehouse={165,-80,WareHouseHeight};
+
+const ROBOTICArm_Pose Place_Scaning={-6,210,190};
+
+const ROBOTICArm_Pose Blue_PlacementLocation_Unstack={-140,223,UnstackHeight};
+const ROBOTICArm_Pose Green_PlacementLocation_Unstack={-7,223.5,UnstackHeight};
+const ROBOTICArm_Pose Red_PlacementLocation_Unstack={132,234,UnstackHeight};
+
+const ROBOTICArm_Pose Blue_PlacementLocation_stack={-140,220,StackHeight};
+const ROBOTICArm_Pose Green_PlacementLocation_stack={-7,220,StackHeight};
+const ROBOTICArm_Pose Red_PlacementLocation_stack={132,230,StackHeight};
+
+const ROBOTICArm_Pose Relay_point={-11.5,200,240};
+
+ROBOTICArm_Pose Initial_state={0,200,200};
+ROBOTICArm_Pose Past_state={0,200,200};
+ROBOTICArm_Pose Current_state={0,200,200};
+ROBOTICArm_Pose Final_state={0,200,200};
+
 const float Arm_Compensation=95.0;
 const float Base_Height=144.0;
 const float Forearm_Length=120.0;
@@ -11,34 +40,7 @@ const float Bigarm_Length=120.0;
 const float Bigarm_UpwardAngle=103.0;
 const float Forearm_UptwardAngle=65.0;
 const float Base_GreenAngle=47.5;
-
-const float Raw_Material_Area_Height=160.0f;
-
-const ROBOTICArm_Pose Raw_Material_Scanning={-160,0,220,Claw_Clawing};
-const ROBOTICArm_Pose Raw_Material_ClawFront={-155,0,135,Claw_Clawing};
-const ROBOTICArm_Pose Raw_Material_ClawLeft={-320,-30,135,Claw_Clawing};
-const ROBOTICArm_Pose Raw_Material_ClawRight={-305,85,135,Claw_Clawing};
-
-const ROBOTICArm_Pose Blue_Warehouse={165,80,145,Claw_Clawing};
-const ROBOTICArm_Pose Green_Warehouse={168,5,145,Claw_Clawing};
-const ROBOTICArm_Pose Red_Warehouse={165,-80,145,Claw_Clawing};
-
-const ROBOTICArm_Pose Place_Scaning={-6,210,190,Claw_Clawing};
-
-const ROBOTICArm_Pose Blue_PlacementLocation_Unstack={-136,220,70,Claw_Clawing};
-const ROBOTICArm_Pose Green_PlacementLocation_Unstack={-2,225.5,70,Claw_Clawing};
-const ROBOTICArm_Pose Red_PlacementLocation_Unstack={137,230,70,Claw_Clawing};
-
-const ROBOTICArm_Pose Blue_PlacementLocation_stack={-122,213,130,Claw_Clawing};
-const ROBOTICArm_Pose Green_PlacementLocation_stack={10,210,130,Claw_Clawing};
-const ROBOTICArm_Pose Red_PlacementLocation_stack={150,216,130,Claw_Clawing};
-
-const ROBOTICArm_Pose Relay_point={-11.5,200,240,Claw_Clawing};
-
-ROBOTICArm_Pose Initial_state={0,200,200,Claw_Release};
-ROBOTICArm_Pose Past_state={0,200,200,Claw_Release};
-ROBOTICArm_Pose Current_state={0,200,200,Claw_Release};
-ROBOTICArm_Pose Final_state={0,200,200,Claw_Release};
+#define linearInterpolationAlgorithm_StepNum 10.0f
 /**
  * @brief Robotic arm moves to the designated position.
  * 
@@ -107,7 +109,7 @@ void ROBOTICArm_initialize(void)
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_4);
     ROBOTICArm_Coordinate_Calculation(Initial_state.XPosition,Initial_state.YPosition,Initial_state.ZPosition);
-    SERVO_ClawSet(Initial_state.Claw_Control);
+    SERVO_ClawSet(Claw_Release);
     Current_state=Initial_state;
     Past_state=Initial_state;
 }
@@ -173,8 +175,8 @@ HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm_Moving(float Final_XPo
                 return HAL_OK;
             }
             if(FeedCNT <= StartEndCNT || FeedCNT >= FeedAmount - StartEndCNT)
-                Self_Delay(150);
-            else Self_Delay(10);
+                Self_Delay(100);
+            else Self_Delay(5);
 
             return HAL_BUSY;
         default:

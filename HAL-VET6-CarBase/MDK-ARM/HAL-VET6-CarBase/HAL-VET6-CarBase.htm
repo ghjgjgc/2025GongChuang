@@ -3,7 +3,7 @@
 <title>Static Call Graph - [HAL-VET6-CarBase\HAL-VET6-CarBase.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image HAL-VET6-CarBase\HAL-VET6-CarBase.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6220000: Last Updated: Sun Mar  2 20:30:12 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6220000: Last Updated: Sat Mar  8 09:57:16 2025
 <BR><P>
 <H3>Maximum Stack Usage =        856 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -113,7 +113,7 @@ Function Pointers
  <LI><a href="#[51]">USART6_IRQHandler</a> from startup_stm32f407xx.o(.text) referenced from startup_stm32f407xx.o(RESET)
  <LI><a href="#[5]">UsageFault_Handler</a> from stm32f4xx_it.o(.text.UsageFault_Handler) referenced from startup_stm32f407xx.o(RESET)
  <LI><a href="#[5e]">VOID_FUNCTION</a> from motor_carbase.o(.text.VOID_FUNCTION) referenced 8 times from motor_carbase.o(.text.Error_compensation)
- <LI><a href="#[5e]">VOID_FUNCTION</a> from motor_carbase.o(.text.VOID_FUNCTION) referenced 18 times from main.o(.text.main)
+ <LI><a href="#[5e]">VOID_FUNCTION</a> from motor_carbase.o(.text.VOID_FUNCTION) referenced 16 times from main.o(.text.main)
  <LI><a href="#[a]">WWDG_IRQHandler</a> from startup_stm32f407xx.o(.text) referenced from startup_stm32f407xx.o(RESET)
  <LI><a href="#[5d]">__main</a> from entry.o(.ARM.Collect$$$$00000000) referenced from startup_stm32f407xx.o(.text)
  <LI><a href="#[5b]">main</a> from main.o(.text.main) referenced from entry9a.o(.ARM.Collect$$$$0000000B)
@@ -449,9 +449,9 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_Coordinate_Calculation
 <LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 <LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Relative
-<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
+<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
 <LI><a href="#[10a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__kernel_poly
 <LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__mathlib_dbl_underflow
 <LI><a href="#[f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_atan
@@ -464,7 +464,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[6e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_round
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_Coordinate_Calculation
-<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
+<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
 <LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__mathlib_dbl_invalid
 <LI><a href="#[f5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_atan
 <LI><a href="#[f6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_acos
@@ -475,21 +475,21 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<BR>[Called By]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 </UL>
 
 <P><STRONG><a name="[74]"></a>__aeabi_d2ulz</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, dfixul.o(.text))
 <BR><BR>[Calls]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsr
 <LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsl
 </UL>
-<BR>[Called By]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
+<BR>[Called By]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
 </UL>
 
 <P><STRONG><a name="[7b]"></a>__aeabi_f2d</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, f2d.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_Coordinate_Calculation
 <LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
 <LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Relative
-<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
+<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
 </UL>
 
 <P><STRONG><a name="[75]"></a>__aeabi_d2f</STRONG> (Thumb, 56 bytes, Stack size 8 bytes, d2f.o(.text))
@@ -499,7 +499,7 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_Coordinate_Calculation
 <LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 <LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Relative
 </UL>
 
@@ -578,7 +578,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
 <P><STRONG><a name="[79]"></a>CarMove_TO_Global</STRONG> (Thumb, 346 bytes, Stack size 88 bytes, motor_carbase.o(.text.CarMove_TO_Global))
-<BR><BR>[Stack]<UL><LI>Max Depth = 368<LI>Call Chain = CarMove_TO_Global &rArr; CarMove_TO_Relative &rArr; TURN &rArr; Motor_PositionControl_UART &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
+<BR><BR>[Stack]<UL><LI>Max Depth = 416<LI>Call Chain = CarMove_TO_Global &rArr; CarMove_TO_Relative &rArr; TURN &rArr; Gyroscopes_ARRAY_Handle &rArr; Send_Number &rArr; Send_Byte &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Relative
 </UL>
@@ -586,48 +586,47 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[7a]"></a>CarMove_TO_Relative</STRONG> (Thumb, 1180 bytes, Stack size 48 bytes, motor_carbase.o(.text.CarMove_TO_Relative))
-<BR><BR>[Stack]<UL><LI>Max Depth = 280<LI>Call Chain = CarMove_TO_Relative &rArr; TURN &rArr; Motor_PositionControl_UART &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
+<BR><BR>[Stack]<UL><LI>Max Depth = 328<LI>Call Chain = CarMove_TO_Relative &rArr; TURN &rArr; Gyroscopes_ARRAY_Handle &rArr; Send_Number &rArr; Send_Byte &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_ONOFF
-<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gyroscopes_ARRAY_Handle
 <LI><a href="#[7d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Base_Start_IT
 <LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2f
-<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
-<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
+<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
 <LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
-<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
+<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
 <LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__hardfp_sqrt
 </UL>
-<BR>[Called By]<UL><LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<BR>[Called By]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 <LI><a href="#[79]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Global
 </UL>
 
 <P><STRONG><a name="[15]"></a>DMA1_Stream0_IRQHandler</STRONG> (Thumb, 16 bytes, Stack size 8 bytes, stm32f4xx_it.o(.text.DMA1_Stream0_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = DMA1_Stream0_IRQHandler &rArr; HAL_DMA_IRQHandler
 </UL>
-<BR>[Calls]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_IRQHandler
+<BR>[Calls]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_IRQHandler
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
 <P><STRONG><a name="[17]"></a>DMA1_Stream2_IRQHandler</STRONG> (Thumb, 16 bytes, Stack size 8 bytes, stm32f4xx_it.o(.text.DMA1_Stream2_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = DMA1_Stream2_IRQHandler &rArr; HAL_DMA_IRQHandler
 </UL>
-<BR>[Calls]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_IRQHandler
+<BR>[Calls]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_IRQHandler
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
 <P><STRONG><a name="[44]"></a>DMA2_Stream2_IRQHandler</STRONG> (Thumb, 16 bytes, Stack size 8 bytes, stm32f4xx_it.o(.text.DMA2_Stream2_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = DMA2_Stream2_IRQHandler &rArr; HAL_DMA_IRQHandler
 </UL>
-<BR>[Calls]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_IRQHandler
+<BR>[Calls]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_IRQHandler
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
 <P><STRONG><a name="[50]"></a>DMA2_Stream7_IRQHandler</STRONG> (Thumb, 16 bytes, Stack size 8 bytes, stm32f4xx_it.o(.text.DMA2_Stream7_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = DMA2_Stream7_IRQHandler &rArr; HAL_DMA_IRQHandler
 </UL>
-<BR>[Calls]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_IRQHandler
+<BR>[Calls]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_DMA_IRQHandler
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
@@ -649,35 +648,38 @@ Global Symbols
 <LI><a href="#[100]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemClock_Config
 </UL>
 
-<P><STRONG><a name="[84]"></a>Error_compensation</STRONG> (Thumb, 2152 bytes, Stack size 168 bytes, motor_carbase.o(.text.Error_compensation))
-<BR><BR>[Stack]<UL><LI>Max Depth = 560<LI>Call Chain = Error_compensation &rArr; ROBOTICArm_linearInterpolationAlgorithm &rArr; ROBOTICArm_linearInterpolationAlgorithm_Moving &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
+<P><STRONG><a name="[83]"></a>Error_compensation</STRONG> (Thumb, 2112 bytes, Stack size 160 bytes, motor_carbase.o(.text.Error_compensation))
+<BR><BR>[Stack]<UL><LI>Max Depth = 552<LI>Call Chain = Error_compensation &rArr; ROBOTICArm_linearInterpolationAlgorithm &rArr; ROBOTICArm_linearInterpolationAlgorithm_Moving &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
 </UL>
-<BR>[Calls]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
+<BR>[Calls]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
 <LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
-<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
-<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_MissionPack
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_MissionPack
 <LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_ONOFF
-<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gyroscopes_ARRAY_Handle
 <LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2f
 <LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Relative
-<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
-<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
-<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_SendMultipleStart
-<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_PositionControl_UART
+<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
+<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gyroscopes_ARRAY_Handle
+<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_SendMultipleStart
+<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_PositionControl_UART
 <LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 </UL>
 <BR>[Called By]<UL><LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Temporary_storage
 <LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Rough_processing
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Raw_Material
 </UL>
 
-<P><STRONG><a name="[7e]"></a>Gyroscopes_ARRAY_Handle</STRONG> (Thumb, 380 bytes, Stack size 16 bytes, usart.o(.text.Gyroscopes_ARRAY_Handle))
-<BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = Gyroscopes_ARRAY_Handle &rArr; Send_Number &rArr; Send_Byte &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
+<P><STRONG><a name="[89]"></a>Gyroscopes_ARRAY_Handle</STRONG> (Thumb, 404 bytes, Stack size 40 bytes, usart.o(.text.Gyroscopes_ARRAY_Handle))
+<BR><BR>[Stack]<UL><LI>Max Depth = 184<LI>Call Chain = Gyroscopes_ARRAY_Handle &rArr; Send_Number &rArr; Send_Byte &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_Number
+<LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_ONOFF
+<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
 </UL>
-<BR>[Called By]<UL><LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
-<LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Relative
+<BR>[Called By]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
 </UL>
 
 <P><STRONG><a name="[8b]"></a>HAL_DMA_Abort</STRONG> (Thumb, 236 bytes, Stack size 24 bytes, stm32f4xx_hal_dma.o(.text.HAL_DMA_Abort))
@@ -694,7 +696,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_IRQHandler
 </UL>
 
-<P><STRONG><a name="[83]"></a>HAL_DMA_IRQHandler</STRONG> (Thumb, 798 bytes, Stack size 32 bytes, stm32f4xx_hal_dma.o(.text.HAL_DMA_IRQHandler))
+<P><STRONG><a name="[82]"></a>HAL_DMA_IRQHandler</STRONG> (Thumb, 798 bytes, Stack size 32 bytes, stm32f4xx_hal_dma.o(.text.HAL_DMA_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = HAL_DMA_IRQHandler
 </UL>
 <BR>[Called By]<UL><LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA2_Stream7_IRQHandler
@@ -721,7 +723,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Start_Receive_DMA
 </UL>
 
-<P><STRONG><a name="[80]"></a>HAL_Delay</STRONG> (Thumb, 66 bytes, Stack size 24 bytes, stm32f4xx_hal.o(.text.HAL_Delay))
+<P><STRONG><a name="[7e]"></a>HAL_Delay</STRONG> (Thumb, 66 bytes, Stack size 24 bytes, stm32f4xx_hal.o(.text.HAL_Delay))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = HAL_Delay
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
@@ -729,11 +731,11 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Raw_Material
 <LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_Init
-<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
-<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 <LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Relative
-<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
+<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
 </UL>
 
 <P><STRONG><a name="[9a]"></a>HAL_GPIO_Init</STRONG> (Thumb, 950 bytes, Stack size 56 bytes, stm32f4xx_hal_gpio.o(.text.HAL_GPIO_Init))
@@ -763,8 +765,8 @@ Global Symbols
 <LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_ClockConfig
 <LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_OscConfig
 <LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_I2C_Mem_Write
-<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 <LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Receive
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 <LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_WaitOnFlagUntilTimeout
 </UL>
 
@@ -1001,7 +1003,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[b5]"></a>HAL_TIM_IRQHandler</STRONG> (Thumb, 538 bytes, Stack size 24 bytes, stm32f4xx_hal_tim.o(.text.HAL_TIM_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 224<LI>Call Chain = HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; Motor_SpeedControl_UART &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
+<BR><BR>[Stack]<UL><LI>Max Depth = 336<LI>Call Chain = HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; Gyroscopes_ARRAY_Handle &rArr; Send_Number &rArr; Send_Byte &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
 <LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIMEx_CommutCallback
@@ -1083,14 +1085,15 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_initialize
 </UL>
 
-<P><STRONG><a name="[b9]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 2464 bytes, Stack size 80 bytes, motor_carbase.o(.text.HAL_TIM_PeriodElapsedCallback))
-<BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = HAL_TIM_PeriodElapsedCallback &rArr; Motor_SpeedControl_UART &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
+<P><STRONG><a name="[b9]"></a>HAL_TIM_PeriodElapsedCallback</STRONG> (Thumb, 2048 bytes, Stack size 128 bytes, motor_carbase.o(.text.HAL_TIM_PeriodElapsedCallback))
+<BR><BR>[Stack]<UL><LI>Max Depth = 312<LI>Call Chain = HAL_TIM_PeriodElapsedCallback &rArr; Gyroscopes_ARRAY_Handle &rArr; Send_Number &rArr; Send_Byte &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Base_Stop_IT
 <LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_SpeedControl_UART
 <LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2f
-<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
-<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_SendMultipleStart
+<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
+<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gyroscopes_ARRAY_Handle
+<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_SendMultipleStart
 <LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
 </UL>
@@ -1165,7 +1168,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 <LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_WaitOnFlagUntilTimeout
 </UL>
-<BR>[Called By]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
+<BR>[Called By]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
 </UL>
 
 <P><STRONG><a name="[d7]"></a>HAL_UART_Receive_DMA</STRONG> (Thumb, 86 bytes, Stack size 24 bytes, stm32f4xx_hal_uart.o(.text.HAL_UART_Receive_DMA))
@@ -1177,7 +1180,7 @@ Global Symbols
 <LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_UART4_Init
 </UL>
 
-<P><STRONG><a name="[104]"></a>HAL_UART_RxCpltCallback</STRONG> (Thumb, 356 bytes, Stack size 8 bytes, usart.o(.text.HAL_UART_RxCpltCallback))
+<P><STRONG><a name="[104]"></a>HAL_UART_RxCpltCallback</STRONG> (Thumb, 418 bytes, Stack size 8 bytes, usart.o(.text.HAL_UART_RxCpltCallback))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = HAL_UART_RxCpltCallback
 </UL>
 <BR>[Called By]<UL><LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Receive_IT
@@ -1198,10 +1201,10 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_Byte
 <LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_SpeedControl_UART
-<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_MissionPack
-<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
-<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_SendMultipleStart
-<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_PositionControl_UART
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_MissionPack
+<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
+<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_SendMultipleStart
+<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_PositionControl_UART
 </UL>
 
 <P><STRONG><a name="[106]"></a>HAL_UART_TxCpltCallback</STRONG> (Thumb, 8 bytes, Stack size 4 bytes, stm32f4xx_hal_uart.o(.text.HAL_UART_TxCpltCallback))
@@ -1221,31 +1224,33 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Raw_Material
 <LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm_Moving
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 <LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Relative
+<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gyroscopes_ARRAY_Handle
 </UL>
 
-<P><STRONG><a name="[89]"></a>MOTOR_SendMultipleStart</STRONG> (Thumb, 36 bytes, Stack size 8 bytes, usart.o(.text.MOTOR_SendMultipleStart))
-<BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = MOTOR_SendMultipleStart &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
+<P><STRONG><a name="[88]"></a>MOTOR_SendMultipleStart</STRONG> (Thumb, 46 bytes, Stack size 16 bytes, usart.o(.text.MOTOR_SendMultipleStart))
+<BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = MOTOR_SendMultipleStart &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Self_Delay
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
-<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
 </UL>
 
-<P><STRONG><a name="[81]"></a>MOTOR_Stop</STRONG> (Thumb, 36 bytes, Stack size 8 bytes, usart.o(.text.MOTOR_Stop))
-<BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = MOTOR_Stop &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
+<P><STRONG><a name="[80]"></a>MOTOR_Stop</STRONG> (Thumb, 52 bytes, Stack size 16 bytes, usart.o(.text.MOTOR_Stop))
+<BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = MOTOR_Stop &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Self_Delay
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PeriodElapsedCallback
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 <LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Relative
-<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
+<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gyroscopes_ARRAY_Handle
+<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
 </UL>
 
 <P><STRONG><a name="[de]"></a>MX_DMA_Init</STRONG> (Thumb, 150 bytes, Stack size 40 bytes, dma.o(.text.MX_DMA_Init))
@@ -1385,18 +1390,18 @@ Global Symbols
 <P><STRONG><a name="[3]"></a>MemManage_Handler</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, stm32f4xx_it.o(.text.MemManage_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
-<P><STRONG><a name="[88]"></a>Motor_PositionControl_UART</STRONG> (Thumb, 200 bytes, Stack size 40 bytes, usart.o(.text.Motor_PositionControl_UART))
-<BR><BR>[Stack]<UL><LI>Max Depth = 136<LI>Call Chain = Motor_PositionControl_UART &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
+<P><STRONG><a name="[87]"></a>Motor_PositionControl_UART</STRONG> (Thumb, 186 bytes, Stack size 56 bytes, usart.o(.text.Motor_PositionControl_UART))
+<BR><BR>[Stack]<UL><LI>Max Depth = 152<LI>Call Chain = Motor_PositionControl_UART &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Self_Delay
 </UL>
-<BR>[Called By]<UL><LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
-<LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
+<BR>[Called By]<UL><LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TURN
 </UL>
 
-<P><STRONG><a name="[c7]"></a>Motor_SpeedControl_UART</STRONG> (Thumb, 204 bytes, Stack size 24 bytes, usart.o(.text.Motor_SpeedControl_UART))
-<BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = Motor_SpeedControl_UART &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
+<P><STRONG><a name="[c7]"></a>Motor_SpeedControl_UART</STRONG> (Thumb, 164 bytes, Stack size 32 bytes, usart.o(.text.Motor_SpeedControl_UART))
+<BR><BR>[Stack]<UL><LI>Max Depth = 128<LI>Call Chain = Motor_SpeedControl_UART &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Self_Delay
@@ -1420,7 +1425,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 144<LI>Call Chain = OLED_Init &rArr; WriteCmd &rArr; HAL_I2C_Mem_Write &rArr; I2C_RequestMemoryWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteCmd
-<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -1478,22 +1483,23 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm_Moving
 <LI><a href="#[f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_initialize
-<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
 </UL>
 
-<P><STRONG><a name="[86]"></a>ROBOTICArm_DirectlyMove</STRONG> (Thumb, 118 bytes, Stack size 32 bytes, robotic_arm.o(.text.ROBOTICArm_DirectlyMove))
+<P><STRONG><a name="[85]"></a>ROBOTICArm_DirectlyMove</STRONG> (Thumb, 118 bytes, Stack size 32 bytes, robotic_arm.o(.text.ROBOTICArm_DirectlyMove))
 <BR><BR>[Stack]<UL><LI>Max Depth = 336<LI>Call Chain = ROBOTICArm_DirectlyMove &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SERVO_ClawSet
 <LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_Coordinate_Calculation
-<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 </UL>
 <BR>[Called By]<UL><LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Rough_processing
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Raw_Material
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 </UL>
 
-<P><STRONG><a name="[f9]"></a>ROBOTICArm_initialize</STRONG> (Thumb, 144 bytes, Stack size 16 bytes, robotic_arm.o(.text.ROBOTICArm_initialize))
+<P><STRONG><a name="[f9]"></a>ROBOTICArm_initialize</STRONG> (Thumb, 142 bytes, Stack size 16 bytes, robotic_arm.o(.text.ROBOTICArm_initialize))
 <BR><BR>[Stack]<UL><LI>Max Depth = 320<LI>Call Chain = ROBOTICArm_initialize &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
 </UL>
 <BR>[Calls]<UL><LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SERVO_ClawSet
@@ -1503,17 +1509,17 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[87]"></a>ROBOTICArm_linearInterpolationAlgorithm</STRONG> (Thumb, 66 bytes, Stack size 32 bytes, robotic_arm.o(.text.ROBOTICArm_linearInterpolationAlgorithm))
+<P><STRONG><a name="[86]"></a>ROBOTICArm_linearInterpolationAlgorithm</STRONG> (Thumb, 66 bytes, Stack size 32 bytes, robotic_arm.o(.text.ROBOTICArm_linearInterpolationAlgorithm))
 <BR><BR>[Stack]<UL><LI>Max Depth = 392<LI>Call Chain = ROBOTICArm_linearInterpolationAlgorithm &rArr; ROBOTICArm_linearInterpolationAlgorithm_Moving &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
 </UL>
 <BR>[Calls]<UL><LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm_Moving
 <LI><a href="#[f8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SERVO_ClawSet
-<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 </UL>
 <BR>[Called By]<UL><LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Temporary_storage
 <LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Rough_processing
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Raw_Material
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 </UL>
 
 <P><STRONG><a name="[fa]"></a>ROBOTICArm_linearInterpolationAlgorithm_Moving</STRONG> (Thumb, 880 bytes, Stack size 56 bytes, robotic_arm.o(.text.ROBOTICArm_linearInterpolationAlgorithm_Moving))
@@ -1523,29 +1529,29 @@ Global Symbols
 <LI><a href="#[f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_Coordinate_Calculation
 <LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_ONOFF
 </UL>
-<BR>[Called By]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
+<BR>[Called By]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
 </UL>
 
-<P><STRONG><a name="[fb]"></a>Raw_Material</STRONG> (Thumb, 1468 bytes, Stack size 144 bytes, main.o(.text.Raw_Material))
-<BR><BR>[Stack]<UL><LI>Max Depth = 704<LI>Call Chain = Raw_Material &rArr; Error_compensation &rArr; ROBOTICArm_linearInterpolationAlgorithm &rArr; ROBOTICArm_linearInterpolationAlgorithm_Moving &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
+<P><STRONG><a name="[fb]"></a>Raw_Material</STRONG> (Thumb, 1060 bytes, Stack size 96 bytes, main.o(.text.Raw_Material))
+<BR><BR>[Stack]<UL><LI>Max Depth = 648<LI>Call Chain = Raw_Material &rArr; Error_compensation &rArr; ROBOTICArm_linearInterpolationAlgorithm &rArr; ROBOTICArm_linearInterpolationAlgorithm_Moving &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
 </UL>
-<BR>[Calls]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
-<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
-<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_MissionPack
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<BR>[Calls]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_MissionPack
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 <LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_ONOFF
-<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[fc]"></a>Rough_processing</STRONG> (Thumb, 1752 bytes, Stack size 192 bytes, main.o(.text.Rough_processing))
-<BR><BR>[Stack]<UL><LI>Max Depth = 752<LI>Call Chain = Rough_processing &rArr; Error_compensation &rArr; ROBOTICArm_linearInterpolationAlgorithm &rArr; ROBOTICArm_linearInterpolationAlgorithm_Moving &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
+<P><STRONG><a name="[fc]"></a>Rough_processing</STRONG> (Thumb, 1788 bytes, Stack size 192 bytes, main.o(.text.Rough_processing))
+<BR><BR>[Stack]<UL><LI>Max Depth = 744<LI>Call Chain = Rough_processing &rArr; Error_compensation &rArr; ROBOTICArm_linearInterpolationAlgorithm &rArr; ROBOTICArm_linearInterpolationAlgorithm_Moving &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
 </UL>
-<BR>[Calls]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
-<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
-<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_MissionPack
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<BR>[Calls]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_MissionPack
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -1560,8 +1566,8 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = SERVO_ClawSet
 </UL>
 <BR>[Called By]<UL><LI><a href="#[f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_initialize
-<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
-<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
+<LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
 </UL>
 
 <P><STRONG><a name="[6]"></a>SVC_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, stm32f4xx_it.o(.text.SVC_Handler))
@@ -1572,9 +1578,9 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm_Moving
 <LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_SpeedControl_UART
-<LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
-<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_SendMultipleStart
-<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_PositionControl_UART
+<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
+<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_SendMultipleStart
+<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_PositionControl_UART
 </UL>
 
 <P><STRONG><a name="[fd]"></a>Send_Byte</STRONG> (Thumb, 32 bytes, Stack size 16 bytes, usart.o(.text.Send_Byte))
@@ -1585,7 +1591,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_Number
 </UL>
 
-<P><STRONG><a name="[85]"></a>Send_MissionPack</STRONG> (Thumb, 54 bytes, Stack size 16 bytes, usart.o(.text.Send_MissionPack))
+<P><STRONG><a name="[84]"></a>Send_MissionPack</STRONG> (Thumb, 62 bytes, Stack size 16 bytes, usart.o(.text.Send_MissionPack))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = Send_MissionPack &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
@@ -1593,7 +1599,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Temporary_storage
 <LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Rough_processing
 <LI><a href="#[fb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Raw_Material
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 </UL>
 
 <P><STRONG><a name="[8a]"></a>Send_Number</STRONG> (Thumb, 158 bytes, Stack size 32 bytes, usart.o(.text.Send_Number))
@@ -1602,7 +1608,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[fe]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Serial_Pow
 <LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_Byte
 </UL>
-<BR>[Called By]<UL><LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gyroscopes_ARRAY_Handle
+<BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gyroscopes_ARRAY_Handle
 </UL>
 
 <P><STRONG><a name="[fe]"></a>Serial_Pow</STRONG> (Thumb, 38 bytes, Stack size 12 bytes, usart.o(.text.Serial_Pow))
@@ -1633,7 +1639,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(.text)
 </UL>
 <P><STRONG><a name="[23]"></a>TIM1_UP_TIM10_IRQHandler</STRONG> (Thumb, 28 bytes, Stack size 8 bytes, stm32f4xx_it.o(.text.TIM1_UP_TIM10_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 232<LI>Call Chain = TIM1_UP_TIM10_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; Motor_SpeedControl_UART &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
+<BR><BR>[Stack]<UL><LI>Max Depth = 344<LI>Call Chain = TIM1_UP_TIM10_IRQHandler &rArr; HAL_TIM_IRQHandler &rArr; HAL_TIM_PeriodElapsedCallback &rArr; Gyroscopes_ARRAY_Handle &rArr; Send_Number &rArr; Send_Byte &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_IRQHandler
 </UL>
@@ -1664,28 +1670,29 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_PWM_ConfigChannel
 </UL>
 
-<P><STRONG><a name="[82]"></a>TURN</STRONG> (Thumb, 744 bytes, Stack size 96 bytes, motor_carbase.o(.text.TURN))
-<BR><BR>[Stack]<UL><LI>Max Depth = 232<LI>Call Chain = TURN &rArr; Motor_PositionControl_UART &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
+<P><STRONG><a name="[81]"></a>TURN</STRONG> (Thumb, 760 bytes, Stack size 96 bytes, motor_carbase.o(.text.TURN))
+<BR><BR>[Stack]<UL><LI>Max Depth = 280<LI>Call Chain = TURN &rArr; Gyroscopes_ARRAY_Handle &rArr; Send_Number &rArr; Send_Byte &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout &rArr; UART_EndRxTransfer
 </UL>
-<BR>[Calls]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
-<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
+<BR>[Calls]<UL><LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_Stop
 <LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Receive
-<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_SendMultipleStart
-<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_PositionControl_UART
+<LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Gyroscopes_ARRAY_Handle
+<LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTOR_SendMultipleStart
+<LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_PositionControl_UART
 <LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2ulz
 <LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 <LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ddiv
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_f2d
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 </UL>
 <BR>[Called By]<UL><LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Relative
 </UL>
 
-<P><STRONG><a name="[102]"></a>Temporary_storage</STRONG> (Thumb, 1304 bytes, Stack size 144 bytes, main.o(.text.Temporary_storage))
-<BR><BR>[Stack]<UL><LI>Max Depth = 704<LI>Call Chain = Temporary_storage &rArr; Error_compensation &rArr; ROBOTICArm_linearInterpolationAlgorithm &rArr; ROBOTICArm_linearInterpolationAlgorithm_Moving &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
+<P><STRONG><a name="[102]"></a>Temporary_storage</STRONG> (Thumb, 1384 bytes, Stack size 160 bytes, main.o(.text.Temporary_storage))
+<BR><BR>[Stack]<UL><LI>Max Depth = 712<LI>Call Chain = Temporary_storage &rArr; Error_compensation &rArr; ROBOTICArm_linearInterpolationAlgorithm &rArr; ROBOTICArm_linearInterpolationAlgorithm_Moving &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
 </UL>
-<BR>[Calls]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
-<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_MissionPack
-<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
+<BR>[Calls]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_linearInterpolationAlgorithm
+<LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Send_MissionPack
+<LI><a href="#[83]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_compensation
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -1715,9 +1722,7 @@ Global Symbols
 <P><STRONG><a name="[5]"></a>UsageFault_Handler</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, stm32f4xx_it.o(.text.UsageFault_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
-<P><STRONG><a name="[5e]"></a>VOID_FUNCTION</STRONG> (Thumb, 20 bytes, Stack size 12 bytes, motor_carbase.o(.text.VOID_FUNCTION))
-<BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = VOID_FUNCTION
-</UL>
+<P><STRONG><a name="[5e]"></a>VOID_FUNCTION</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, motor_carbase.o(.text.VOID_FUNCTION))
 <BR>[Address Reference Count : 2]<UL><LI> motor_carbase.o(.text.Error_compensation)
 <LI> main.o(.text.main)
 </UL>
@@ -1729,7 +1734,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_Init
 </UL>
 
-<P><STRONG><a name="[5b]"></a>main</STRONG> (Thumb, 860 bytes, Stack size 104 bytes, main.o(.text.main))
+<P><STRONG><a name="[5b]"></a>main</STRONG> (Thumb, 900 bytes, Stack size 112 bytes, main.o(.text.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 856<LI>Call Chain = main &rArr; Rough_processing &rArr; Error_compensation &rArr; ROBOTICArm_linearInterpolationAlgorithm &rArr; ROBOTICArm_linearInterpolationAlgorithm_Moving &rArr; ROBOTICArm_Coordinate_Calculation &rArr; __hardfp_acos &rArr; __kernel_poly &rArr; __aeabi_dadd &rArr; _double_epilogue &rArr; _double_round
 </UL>
 <BR>[Calls]<UL><LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Temporary_storage
@@ -1753,9 +1758,10 @@ Global Symbols
 <LI><a href="#[ec]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_Clear
 <LI><a href="#[ef]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_Init
 <LI><a href="#[f9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_initialize
+<LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ROBOTICArm_DirectlyMove
 <LI><a href="#[79]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CarMove_TO_Global
 <LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_ONOFF
-<LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> entry9a.o(.ARM.Collect$$$$0000000B)
 </UL>
@@ -1972,8 +1978,8 @@ Local Symbols
 <P><STRONG><a name="[a5]"></a>__NVIC_SetPriority</STRONG> (Thumb, 66 bytes, Stack size 8 bytes, stm32f4xx_hal_cortex.o(.text.__NVIC_SetPriority))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = __NVIC_SetPriority
 </UL>
-<BR>[Called By]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_NVIC_SetPriority
-<LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Config
+<BR>[Called By]<UL><LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Config
+<LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_NVIC_SetPriority
 </UL>
 
 <P><STRONG><a name="[a2]"></a>__NVIC_EnableIRQ</STRONG> (Thumb, 48 bytes, Stack size 4 bytes, stm32f4xx_hal_cortex.o(.text.__NVIC_EnableIRQ))

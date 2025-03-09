@@ -50,7 +50,6 @@ void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 extern float Target_angle,angle,Err_Angle,Err_Angle_Past,Raw_angle;
-extern uint8_t Turban1_Index,Turban2_Index;
 void MOTOR_SendMultipleStart(void);
 HAL_StatusTypeDef Motor_SpeedControl_UART(Motor_ID Motor_ID, Motor_DIRECTION Direction, float Speed,uint8_t Accleration);
 HAL_StatusTypeDef Motor_PositionControl_UART(Motor_ID Motor_ID, Motor_DIRECTION Direction, float Speed,uint8_t Accleration,uint64_t PluseNum);

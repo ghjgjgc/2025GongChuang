@@ -51,6 +51,7 @@
 /* USER CODE BEGIN PV */
 uint8_t DEBUG_USART[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 Color Mission_Order[6]={Green,Blue,Red,Blue,Green,Red};
+const Color Color_Order[3]={Blue,Green,Red};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -119,7 +120,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   LED_ONOFF(LED_ALL,0);
   ////////////////////////Test
-  enum Mission_Current Mission_Select=Test;
+  enum Mission_Current Mission_Select=QR_First	;
   ///////////////////////QR_First
   while (1)
   {
@@ -131,18 +132,27 @@ int main(void)
         // TURN(Car_Posture_Right,Car_Posture_Left);
         // CarMove_TO_Global(RoughProcess_CARPOSITION.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Temporary_CARPOSITION.Posture,VOID_FUNCTION);
         // CarMove_TO_Global(Temporary_CARPOSITION.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Temporary_CARPOSITION.Posture,VOID_FUNCTION);
-        // CarMove_TO_Global(0,-1000,Car_Posture_Down,VOID_FUNCTION);
+        // CarMove_TO_Global(0,1000,Car_Posture_Up,VOID_FUNCTION);
         // HAL_Delay(500);
-        // Error_compensation(Raw_Material_Compensation);
+        // Error_compensation(Raw_Material_Compensation); 
         // Error_compensation(Angle_compensation);
         // Error_compensation(UnStacking_Correction);
-        Position_Test();
+        // while (1)
+        // {
+        //   Gyroscopes_ARRAY_Handle();
+        //   HAL_Delay(100);
+        // }
+        // Position_Test();
         /*_____________ROBOTICARM_____________*/
-        // ROBOTICArm_DirectlyMove(Raw_Material_ClawLeft.XPosition,Raw_Material_ClawLeft.YPosition,Raw_Material_ClawLeft.ZPosition,Claw_ReleaseFull,150,1);
+        ROBOTICArm_DirectlyMove(Raw_Material_Scanning.XPosition,Raw_Material_Scanning.YPosition,Raw_Material_Scanning.ZPosition,Claw_ReleaseFull,1,500);
+        // ROBOTICArm_DirectlyMove(Raw_Material_ClawFront.XPosition-10,Raw_Material_ClawFront.YPosition-10,Raw_Material_Scanning.ZPosition,Claw_ReleaseFull,200,1);
         // SERVO_ClawSet(Claw_ReleaseFull);
         /*_____________MISSION_____________*/
-        // Raw_Material();
-        // Rough_processing();
+        // while(rk3588_Arry[1]==0x67)HAL_Delay(10);
+        // LED_ONOFF(LED1,0);
+        // for (uint8_t i = 0; i < 6; i++)Mission_Order[i]=(Color)(rk3588_Arry[i+2]-1);
+        Raw_Material();
+        //  Rough_processing();
         // Temporary_storage();
         /*_____________OTHER_____________*/
         OLED_SHOWBIGNUM();
@@ -152,7 +162,7 @@ int main(void)
       /*-------------------------------------------------------------------------------------------------------------------------------------------*/
 			case QR_First:
         //Start and scanning QR code
-        CarMove_TO_Global(QR_CARPOSITION.X_POSITION,None_CARPOSITION.Y_POSITION,QR_CARPOSITION.Posture,VOID_FUNCTION);
+        CarMove_TO_Global(QR_CARPOSITION.X_POSITION,Start_CARPOSITION.Y_POSITION,QR_CARPOSITION.Posture,VOID_FUNCTION);
         CarMove_TO_Global(QR_CARPOSITION.X_POSITION,QR_CARPOSITION.Y_POSITION,QR_CARPOSITION.Posture,VOID_FUNCTION);
         LED_ONOFF(LED1,1);
         while(rk3588_Arry[1]==0x67)HAL_Delay(10);
@@ -175,14 +185,14 @@ int main(void)
         CarMove_TO_Global(Temporary_CARPOSITION.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Temporary_CARPOSITION.Posture,VOID_FUNCTION);
         Temporary_storage();
       /*-------------------------------------------------------------------------------------------------------------------------------------------*/
-      case Raw_Material_Second:
+      case Raw_Material_Second: 
         //Raw_Material_Second
-        CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,Temporary_CARPOSITION.Y_POSITION,RawMaterial_CARPOSITION_Second.Posture,VOID_FUNCTION);
+        CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Car_Posture_Up,VOID_FUNCTION);
         CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,RawMaterial_CARPOSITION_Second.Y_POSITION,RawMaterial_CARPOSITION_Second.Posture,VOID_FUNCTION);
         Raw_Material();
       case Rough_processing_Second:
         //Rough_processing_Second
-        CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,Temporary_CARPOSITION.Y_POSITION,RawMaterial_CARPOSITION_Second.Posture,VOID_FUNCTION);
+        CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,RoughProcess_CARPOSITION_Second.Y_POSITION,RawMaterial_CARPOSITION_Second.Posture,VOID_FUNCTION);
         CarMove_TO_Global(RoughProcess_CARPOSITION_Second.X_POSITION,RoughProcess_CARPOSITION_Second.Y_POSITION,RoughProcess_CARPOSITION_Second.Posture,VOID_FUNCTION);
         Rough_processing();
       case Temporary_storage_Second:
@@ -192,6 +202,7 @@ int main(void)
         Temporary_storage();
       case End:
         //End
+        CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,Temporary_CARPOSITION_Second.Y_POSITION,Start_CARPOSITION_Second.Posture,VOID_FUNCTION);
         CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,Start_CARPOSITION_Second.Y_POSITION,Start_CARPOSITION_Second.Posture,VOID_FUNCTION);
         CarMove_TO_Global(Start_CARPOSITION_Second.X_POSITION,Start_CARPOSITION_Second.Y_POSITION,Start_CARPOSITION_Second.Posture,VOID_FUNCTION);
         Mission_Select=None;
@@ -279,8 +290,14 @@ void Raw_Material(void)
     //Analysis sequence
     if(Mission_Order[n+Raw_Material_CNT*3]==Forward_Color)
     {
-      ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawFront.XPosition,Raw_Material_ClawFront.YPosition,Raw_Material_ClawFront.ZPosition,Claw_Clawing,1);
-      ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawFront.XPosition-10,Raw_Material_ClawFront.YPosition-10,Raw_Material_ClawFront.ZPosition,Claw_Clawing,200);
+      // ROBOTICArm_DirectlyMove(Raw_Material_ClawFront.XPosition-10,Raw_Material_ClawFront.YPosition-10,Raw_Material_ClawFront.ZPosition+100,Claw_ReleaseFull,200,1);
+      #if Rotation_direction==-1
+      ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawFront.XPosition-20,Raw_Material_ClawFront.YPosition+15,Raw_Material_ClawFront.ZPosition,Claw_Clawing,200);
+      #elif Rotation_direction==1
+      ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawFront.XPosition-40,Raw_Material_ClawFront.YPosition-15,Raw_Material_ClawFront.ZPosition,Claw_Clawing,200);
+      #elif Rotation_direction==0
+      ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawFront.XPosition,Raw_Material_ClawFront.YPosition,Raw_Material_ClawFront.ZPosition,Claw_Clawing,200);
+      #endif
       ROBOTICArm_DirectlyMove(Raw_Material_ClawFront.XPosition,Raw_Material_ClawFront.YPosition,Raw_Material_ClawFront.ZPosition+100,Claw_Clawing,100,1);
       Claw_=Yes;
     }
@@ -346,6 +363,7 @@ void Raw_Material(void)
         }
       }
     }
+    ROBOTICArm_DirectlyMove(Raw_Material_Scanning.XPosition,Raw_Material_Scanning.YPosition,Raw_Material_Scanning.ZPosition,Claw_Clawing,1,1);
     //Store in warehouse
     if(Claw_==Yes)
     {
@@ -354,17 +372,17 @@ void Raw_Material(void)
       switch (Mission_Order[n+Raw_Material_CNT*3])
       {
       case Red:
-        ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+90,Claw_Clawing,850,1);
+        ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+90,Claw_Clawing,1000,1);
         ROBOTICArm_linearInterpolationAlgorithm(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition,Claw_Release,200);
         ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+50,Claw_Release,200,1);
         break;
       case Green:
-        ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+80,Claw_Clawing,650,1);
+        ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+80,Claw_Clawing,800,1);
 				ROBOTICArm_linearInterpolationAlgorithm(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition,Claw_Release,200);
         ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+50,Claw_Release,200,1);
         break;
       case Blue:
-        ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+90,Claw_Clawing,500,1);
+        ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+90,Claw_Clawing,700,1);
 				ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition,Claw_Release,200);
         ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+90,Claw_Release,200,1);
         break;
@@ -454,9 +472,9 @@ void Rough_processing(void)
       //Claw from WareHouse
       ROBOTICArm_DirectlyMove(Green_PlacementLocation_Unstack.XPosition+10,Green_PlacementLocation_Unstack.YPosition-10,Green_Warehouse.ZPosition+75,Claw_ReleaseFull,200,300);
       ROBOTICArm_DirectlyMove(Green_PlacementLocation_Unstack.XPosition+10,Green_PlacementLocation_Unstack.YPosition-10,Green_PlacementLocation_Unstack.ZPosition+65,Claw_ReleaseFull,1,200);
-      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition,Claw_Clawing,200);
+      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition,Claw_Clawing,300);
       //Goto Midpoint
-      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_Warehouse.ZPosition+75,Claw_Clawing,1);
+      ROBOTICArm_DirectlyMove(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_Warehouse.ZPosition+75,Claw_Clawing,200,1);
       //Goto PacePoint
       ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+75,Claw_Clawing,400,1);
       ROBOTICArm_linearInterpolationAlgorithm(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition,Claw_Release,300);
@@ -467,9 +485,10 @@ void Rough_processing(void)
       ROBOTICArm_DirectlyMove(Blue_PlacementLocation_Unstack.XPosition+5,Blue_PlacementLocation_Unstack.YPosition-18,Blue_Warehouse.ZPosition+75,Claw_Release,300,300);
       ROBOTICArm_DirectlyMove(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition,Claw_Clawing,200,200);
       //Goto Midpoint
-      ROBOTICArm_linearInterpolationAlgorithm(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_Clawing,1);
+      ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_Clawing,200,1);
       //Goto PacePoint
       ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+75,Claw_Clawing,300,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+25,Claw_Clawing,300);
       ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition,Claw_Release,300);
       ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+75,Claw_Release,100,1);
       break;
@@ -488,7 +507,7 @@ void Temporary_storage(void)
   static uint8_t Temporary_storage_CNT = 0;
   if(Temporary_storage_CNT==0)
   {
-    Error_compensation(Angle_compensation);
+    // Error_compensation(Angle_compensation);
     Error_compensation(UnStacking_Correction);
   }
   else
@@ -500,6 +519,7 @@ void Temporary_storage(void)
   //claw from warehouse
   for (; n < 3;)
   {
+    ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+75,Claw_Clawing,1);
     switch (Mission_Order[n+Temporary_storage_CNT*3])
     {
     case Red:
@@ -532,20 +552,20 @@ void Temporary_storage(void)
       if(Temporary_storage_CNT==0)
       {
       //Goto Midpoint
-      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+75,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Green_Warehouse.ZPosition+75,Claw_Clawing,1);
       //Goto PacePoint
-      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition+50,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_Warehouse.ZPosition+50,Claw_Clawing,1);
       ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition,Claw_Release,300);
-      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition+50,Claw_Release,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_Warehouse.ZPosition+50,Claw_Release,1);
       }
       else
       {
       //Goto Midpoint
       ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+75,Claw_Clawing,1);
       //Goto PacePoint
-      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_stack.XPosition,Green_PlacementLocation_stack.YPosition,Green_PlacementLocation_stack.ZPosition+50,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_stack.XPosition,Green_PlacementLocation_stack.YPosition,Green_Warehouse.ZPosition+50,Claw_Clawing,1);
       ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_stack.XPosition,Green_PlacementLocation_stack.YPosition,Green_PlacementLocation_stack.ZPosition,Claw_Release,300);
-      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_stack.XPosition,Green_PlacementLocation_stack.YPosition,Green_PlacementLocation_stack.ZPosition+50,Claw_Release,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_stack.XPosition,Green_PlacementLocation_stack.YPosition,Green_Warehouse.ZPosition+50,Claw_Release,1);
       }
       break;
     case Blue:
@@ -556,20 +576,20 @@ void Temporary_storage(void)
       if(Temporary_storage_CNT==0)
       {
       //Goto Midpoint
-      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+75,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Blue_Warehouse.ZPosition+75,Claw_Clawing,1);
       //Goto PacePoint
-      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition+50,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_Warehouse.ZPosition+50,Claw_Clawing,1);
       ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition,Claw_Release,300);
-      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition+50,Claw_Release,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_Warehouse.ZPosition+50,Claw_Release,1);
       }
       else
       {
       //Goto Midpoint
-      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_stack.XPosition,Blue_PlacementLocation_stack.YPosition,Red_Warehouse.ZPosition+75,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Blue_Warehouse.ZPosition+75,Claw_Clawing,1);
       //Goto PacePoint
-      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_stack.XPosition,Blue_PlacementLocation_stack.YPosition,Blue_PlacementLocation_stack.ZPosition+50,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_stack.XPosition,Blue_PlacementLocation_stack.YPosition,Blue_Warehouse.ZPosition+50,Claw_Clawing,1);
       ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_stack.XPosition,Blue_PlacementLocation_stack.YPosition,Blue_PlacementLocation_stack.ZPosition,Claw_Release,300);
-      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_stack.XPosition,Blue_PlacementLocation_stack.YPosition,Blue_PlacementLocation_stack.ZPosition+50,Claw_Release,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_stack.XPosition,Blue_PlacementLocation_stack.YPosition,Blue_Warehouse.ZPosition+50,Claw_Release,1);
       }
       break;
     default:
@@ -582,32 +602,32 @@ void Temporary_storage(void)
 }
 void Position_Test(void)
 {
-  CarMove_TO_Global(QR_CARPOSITION.X_POSITION,None_CARPOSITION.Y_POSITION,QR_CARPOSITION.Posture,VOID_FUNCTION);
+  CarMove_TO_Global(QR_CARPOSITION.X_POSITION,Start_CARPOSITION.Y_POSITION,QR_CARPOSITION.Posture,VOID_FUNCTION);
   CarMove_TO_Global(QR_CARPOSITION.X_POSITION,QR_CARPOSITION.Y_POSITION,QR_CARPOSITION.Posture,VOID_FUNCTION);
   
   CarMove_TO_Global(RawMaterial_CARPOSITION.X_POSITION,RawMaterial_CARPOSITION.Y_POSITION,RawMaterial_CARPOSITION.Posture,VOID_FUNCTION);
   ROBOTICArm_DirectlyMove(Raw_Material_Scanning.XPosition,Raw_Material_Scanning.YPosition,Raw_Material_Scanning.ZPosition,Claw_ReleaseFull,700,500);
-  // Error_compensation(Raw_Material_Compensation);
+  Error_compensation(Raw_Material_Compensation);
   ROBOTICArm_initialize();
   
   CarMove_TO_Global(RawMaterial_CARPOSITION.X_POSITION,RoughProcess_CARPOSITION.Y_POSITION,RawMaterial_CARPOSITION.Posture,VOID_FUNCTION);
   CarMove_TO_Global(RoughProcess_CARPOSITION.X_POSITION,RoughProcess_CARPOSITION.Y_POSITION,RoughProcess_CARPOSITION.Posture,VOID_FUNCTION);
-  // Error_compensation(Angle_compensation);
-  // Error_compensation(UnStacking_Correction);
+  Error_compensation(Angle_compensation);
+  Error_compensation(UnStacking_Correction);
   
   CarMove_TO_Global(RoughProcess_CARPOSITION.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Temporary_CARPOSITION.Posture,VOID_FUNCTION);
   CarMove_TO_Global(Temporary_CARPOSITION.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Temporary_CARPOSITION.Posture,VOID_FUNCTION);
-  // Error_compensation(Angle_compensation);
-  // Error_compensation(UnStacking_Correction);
+  Error_compensation(Angle_compensation);
+  Error_compensation(UnStacking_Correction);
 
   CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,Temporary_CARPOSITION.Y_POSITION,RawMaterial_CARPOSITION_Second.Posture,VOID_FUNCTION);
   CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,RawMaterial_CARPOSITION_Second.Y_POSITION,RawMaterial_CARPOSITION_Second.Posture,VOID_FUNCTION);
   ROBOTICArm_DirectlyMove(Raw_Material_Scanning.XPosition,Raw_Material_Scanning.YPosition,Raw_Material_Scanning.ZPosition,Claw_ReleaseFull,700,500);
-  // Error_compensation(Raw_Material_Compensation);
+  Error_compensation(Raw_Material_Compensation);
   ROBOTICArm_initialize();
 
-  CarMove_TO_Global(QR_CARPOSITION.X_POSITION-10,QR_CARPOSITION.Y_POSITION,QR_CARPOSITION.Posture,VOID_FUNCTION);
-  CarMove_TO_Global(None_CARPOSITION.X_POSITION,None_CARPOSITION.Y_POSITION,QR_CARPOSITION.Posture,VOID_FUNCTION);
+  CarMove_TO_Global(QR_CARPOSITION.X_POSITION,QR_CARPOSITION.Y_POSITION,QR_CARPOSITION.Posture,VOID_FUNCTION);
+  CarMove_TO_Global(Start_CARPOSITION.X_POSITION,Start_CARPOSITION.Y_POSITION,QR_CARPOSITION.Posture,VOID_FUNCTION);
 }
 /* USER CODE END 4 */
 

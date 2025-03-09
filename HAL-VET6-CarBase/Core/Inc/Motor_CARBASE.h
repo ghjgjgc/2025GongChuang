@@ -24,10 +24,10 @@ struct Car_Pose{
 /* USER CODE END PV */
 
 /* USER CODE BEGIN PFP */
-void CarMove_TO_Global(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition));
-HAL_StatusTypeDef VOID_FUNCTION(float AIM_XPosition,float AIM_YPosition,float AIM_ZPosition);
+void CarMove_TO_Global(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,HAL_StatusTypeDef Part_TimeJob(void));
+HAL_StatusTypeDef VOID_FUNCTION(void);
 HAL_StatusTypeDef Error_compensation(Mission_Code CODE);
 void TURN(Car_Posture Aim_CARPOSITON_RELATIVE,Car_Posture Current_CARPOSITION_RELATIVE);
-extern struct Car_Pose None_CARPOSITION,QR_CARPOSITION,RawMaterial_CARPOSITION,RoughProcess_CARPOSITION,Temporary_CARPOSITION,Start_CARPOSITION_Second,RawMaterial_CARPOSITION_Second,RoughProcess_CARPOSITION_Second,Temporary_CARPOSITION_Second;
+extern struct Car_Pose Start_CARPOSITION,None_CARPOSITION,QR_CARPOSITION,RawMaterial_CARPOSITION,RoughProcess_CARPOSITION,Temporary_CARPOSITION,Start_CARPOSITION_Second,RawMaterial_CARPOSITION_Second,RoughProcess_CARPOSITION_Second,Temporary_CARPOSITION_Second;
 /* USER CODE END PFP */
 #endif 

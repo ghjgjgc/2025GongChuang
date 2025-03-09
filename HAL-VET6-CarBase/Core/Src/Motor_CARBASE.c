@@ -2,47 +2,46 @@
 
 #if SpecialONOFF==0
 /* USER CODE BEGIN PD */
-    
+#define TURNED_ANGLEPLUSE 4350
+#define offsetsX 3.20f
+#define offsetsY 2.90f
+
+const float Motor_P=3,Motor_D=0.8;
+const float TimerCost=(1679+1)*(9999+1)/168000000; //0.1s
+const float Maxium_Speed_Set = 5000; // mm/Maxium_Speed_Set
+float Motor_Acceleration = 4.0f * PI * 75.0f / 60.0f ; //mm/TimerCost 
 /* USER CODE END PD */
 
 /* USER CODE BEGIN PV */
     //Define Key Value
-    #define TURNED_ANGLEPLUSE 4350
-    #define offsetsX 3.20f
-	#define offsetsY 2.90f
-
-    const float Motor_P=3,Motor_D=0.8;
-    const float TimerCost=(1679+1)*(9999+1)/168000000; //0.1s
-    const float Maxium_Speed_Set = 4000; // mm/Maxium_Speed_Set
-    float Motor_Acceleration = 4.0f * PI * 75.0f / 60.0f ; //mm/TimerCost 
-
+    struct Car_Pose Start_CARPOSITION={0,0,Car_Posture_Up};
     struct Car_Pose QR_CARPOSITION={160,500,Car_Posture_Up};
     struct Car_Pose RawMaterial_CARPOSITION={160,1350,Car_Posture_Right};
-    struct Car_Pose RoughProcess_CARPOSITION={1780,960,Car_Posture_Down};
+    struct Car_Pose RoughProcess_CARPOSITION={1720,960,Car_Posture_Down};
     struct Car_Pose Temporary_CARPOSITION={900,1650,Car_Posture_Left};
 
     struct Car_Pose Start_CARPOSITION_Second={0,0,Car_Posture_Up};
-    struct Car_Pose RawMaterial_CARPOSITION_Second={155,1250,Car_Posture_Right};
-    struct Car_Pose RoughProcess_CARPOSITION_Second={1780,960,Car_Posture_Down};
+    struct Car_Pose RawMaterial_CARPOSITION_Second={140,1250,Car_Posture_Right};
+    struct Car_Pose RoughProcess_CARPOSITION_Second={1760,900,Car_Posture_Down};
     struct Car_Pose Temporary_CARPOSITION_Second={900,1650,Car_Posture_Left};
-
+    /*__________________________________________________________________*/
     //Definition of data type
     struct Car_Pose Current_CARPOSITION_GLOBAL={0,0,Car_Posture_Up};
-    struct Car_Pose None_CARPOSITION={0,0,Car_Posture_Up};
-
     extern const ROBOTICArm_Pose Relay_point,Place_Scaning;
-
     //Define Stored global variables
     int32_t StartEnd_CostCNTX=0,StartEnd_CostCNTY=0,SpeedHold_CNTX=0,SpeedHold_CNTY=0,TIM_CNT=0,Total_CNTX=0,Total_CNTY=0,Key_CNT=0;
-    Variable_Flag If_Motor_Busy=No;
-    Motor_DIRECTION Motor1_Direction = Motor_Forward,Motor2_Direction = Motor_Forward,Motor3_Direction = Motor_Forward,Motor4_Direction = Motor_Forward;
+    Variable_Flag If_Motor_Busy=No,Raw_Material_Compensation_Flag=No,Error_Flag=No,X_Flag=No;
     float Maxium_Speed_ActualX = 0 , Maxium_Speed_ActualY=0;
-    float Motor1_Speed=0, Motor2_Speed=0, Motor3_Speed=0, Motor4_Speed=0,
-		Motor1_PIDSpeed=0,Motor2_PIDSpeed=0,Motor3_PIDSpeed=0,Motor4_PIDSpeed=0,
-        Motor1_SpeedX=0, Motor2_SpeedX=0, Motor3_SpeedX=0, Motor4_SpeedX=0,
-        Motor1_SpeedY=0, Motor2_SpeedY=0, Motor3_SpeedY=0, Motor4_SpeedY=0;
     int8_t OverAll_PostureX,OverAll_PostureY,Motor1_PID_Direction,Motor2_PID_Direction,Motor3_PID_Direction,Motor4_PID_Direction;
 /* USER CODE END PV */
+
+
+/**
+ * @brief Turn
+ * 
+ * @param Aim_CARPOSITON_RELATIVE Aim_CARPOSITON_RELATIVE
+ * @param Current_CARPOSITION_RELATIVE Current_CARPOSITION_RELATIVE
+ */
 void TURN(Car_Posture Aim_CARPOSITON_RELATIVE,Car_Posture Current_CARPOSITION_RELATIVE)
 {
     float TURNED_ANGLE;uint8_t ArrivePack[4]={0x00,0x00,0x00,0x00};
@@ -61,20 +60,32 @@ void TURN(Car_Posture Aim_CARPOSITON_RELATIVE,Car_Posture Current_CARPOSITION_RE
     default:
         break;
     }
+    HAL_Delay(100);
     Motor_PositionControl_UART(Motor1,TURNED_ANGLE>=0?Motor_Backward:Motor_Forward,1000,0x10,fabs(TURNED_ANGLE)/90*TURNED_ANGLEPLUSE);
     Motor_PositionControl_UART(Motor2,TURNED_ANGLE>=0?Motor_Forward:Motor_Backward,1000,0x10,fabs(TURNED_ANGLE)/90*TURNED_ANGLEPLUSE);
     Motor_PositionControl_UART(Motor3,TURNED_ANGLE>=0?Motor_Backward:Motor_Forward,1000,0x10,fabs(TURNED_ANGLE)/90*TURNED_ANGLEPLUSE);
     Motor_PositionControl_UART(Motor4,TURNED_ANGLE>=0?Motor_Forward:Motor_Backward,1000,0x10,fabs(TURNED_ANGLE)/90*TURNED_ANGLEPLUSE);
     MOTOR_SendMultipleStart();
-    while(HAL_UART_Receive(&huart1,ArrivePack,4,0xFFFF)!=HAL_OK){Gyroscopes_ARRAY_Handle();}
+    ArrivePack[2]=0x00;
+    while(ArrivePack[2]!=0x9F)
+    {
+        Gyroscopes_ARRAY_Handle();
+        HAL_UART_Receive(&huart1,ArrivePack,4,0x01);
+    }
     HAL_Delay(10);
     MOTOR_Stop();
     ArrivePack[2]=0;
     Target_angle+=TURNED_ANGLE;
 }
-Variable_Flag Raw_Material_Compensation_Flag=No,Error_Flag=No,X_Flag=No;
+/**
+ * @brief CarMove_TO_Relative
+ * 
+ * @param Aim_CARPOSITON_RELATIVE  Aim_CARPOSITON_RELATIVE
+ * @param Current_CARPOSITION_RELATIVE  Current_CARPOSITION_RELATIVE
+ * @param Part_TimeJob  useless
+ */
 void CarMove_TO_Relative(struct Car_Pose Aim_CARPOSITON_RELATIVE,struct Car_Pose Current_CARPOSITION_RELATIVE , 
-    HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition))
+    HAL_StatusTypeDef Part_TimeJob(void))
 {
     //Calculate the actual operating distance.
     float X_Distance = offsetsX*fabs(Aim_CARPOSITON_RELATIVE.X_POSITION - Current_CARPOSITION_RELATIVE.X_POSITION);
@@ -131,7 +142,8 @@ void CarMove_TO_Relative(struct Car_Pose Aim_CARPOSITON_RELATIVE,struct Car_Pose
     //I call it "Part_timeJob" , But this feature has quite a lot of limitations
     while(If_Motor_Busy==Yes)
     {
-        Gyroscopes_ARRAY_Handle();
+        HAL_Delay(10);
+        // Gyroscopes_ARRAY_Handle();
         // Send_Number(angle,3);
         /*
         // //Calculation of the speed of each motor in the X direction.
@@ -225,9 +237,8 @@ void CarMove_TO_Relative(struct Car_Pose Aim_CARPOSITON_RELATIVE,struct Car_Pose
     }
     LED_ONOFF(LED1,1);
     //The vehicle XYmovement has ended.
-    HAL_Delay(100);
+    HAL_Delay(10);
     MOTOR_Stop();
-    HAL_Delay(500);
 
     //The change in the angle of the entire vehicle.
     if(Current_CARPOSITION_RELATIVE.Posture!=Aim_CARPOSITON_RELATIVE.Posture)
@@ -245,7 +256,7 @@ void CarMove_TO_Relative(struct Car_Pose Aim_CARPOSITON_RELATIVE,struct Car_Pose
  * @param Aim_Posture CarPosture
  * @param function part_timeJob
  */
-void CarMove_TO_Global(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,HAL_StatusTypeDef Part_TimeJob(float Final_XPosition,float Final_YPosition,float Final_ZPosition))
+void CarMove_TO_Global(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_Posture,HAL_StatusTypeDef Part_TimeJob(void))
 {
     struct Car_Pose Current_CARPOSITION_RELATIVE , Aim_CARPOSITON_RELATIVE , Aim_CARPOSITON_GLOBAL;
     Aim_CARPOSITON_GLOBAL.X_POSITION=X_AIMPOSITION;
@@ -301,10 +312,15 @@ void CarMove_TO_Global(float X_AIMPOSITION,float Y_AIMPOSITION,Car_Posture Aim_P
     //CarMove_TO_Relative Pose
     CarMove_TO_Relative(Aim_CARPOSITON_RELATIVE,Current_CARPOSITION_RELATIVE,Part_TimeJob);
 }
-
+/**
+ * @brief Error_compensation
+ * 
+ * @param CODE UnStacking_Correction=2,Stacking_Correction=3,Angle_compensation=4,Raw_Material_Compensation=5,Raw_Material_Mission=1
+ * @return HAL_StatusTypeDef 
+ */
 HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
 {
-    struct Car_Pose CompensationAim_Pose={0,0,Current_CARPOSITION_GLOBAL.Posture};
+    struct Car_Pose CompensationAim_Pose={0,0,Current_CARPOSITION_GLOBAL.Posture};struct Car_Pose None_CARPOSITION={0,0,Car_Posture_Up};
     switch (CODE)
     {
         case UnStacking_Correction:/*____________________________________________________________________________________*/
@@ -331,7 +347,7 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
             }
             LED_ONOFF(LED1,0);
             rk3588_Arry[6]=0x00;
-            ROBOTICArm_linearInterpolationAlgorithm(Place_Scaning.XPosition,Place_Scaning.YPosition,Place_Scaning.ZPosition-85,Claw_ReleaseFull,1);
+            ROBOTICArm_linearInterpolationAlgorithm(Place_Scaning.XPosition,Place_Scaning.YPosition,Place_Scaning.ZPosition-70,Claw_ReleaseFull,1);
             while (rk3588_Arry[6]!=0x01)
             {
                 LED_ONOFF(LED1,1);
@@ -432,7 +448,7 @@ HAL_StatusTypeDef Error_compensation(Mission_Code CODE)
                     None_CARPOSITION.Posture=Current_CARPOSITION_GLOBAL.Posture;
                     CarMove_TO_Relative(None_CARPOSITION,CompensationAim_Pose,VOID_FUNCTION);
                     CompensationAim_Pose.X_POSITION=None_CARPOSITION.X_POSITION;
-                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[2]*(rk3588_Arry[4]==0?-1: 1)*0.5;
+                    CompensationAim_Pose.Y_POSITION=rk3588_Arry[2]*(rk3588_Arry[4]==0?-1: 1)*0.3;
                     CarMove_TO_Relative(None_CARPOSITION,CompensationAim_Pose,VOID_FUNCTION);
                     rk3588_Arry[6]=0x00;
                     Send_MissionPack(Raw_Material_Compensation,1);
@@ -454,6 +470,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if(htim->Instance==TIM10)
     {
+        float Motor1_Speed=0, Motor2_Speed=0, Motor3_Speed=0, Motor4_Speed=0,
+		Motor1_PIDSpeed=0,Motor2_PIDSpeed=0,Motor3_PIDSpeed=0,Motor4_PIDSpeed=0,
+        Motor1_SpeedX=0, Motor2_SpeedX=0, Motor3_SpeedX=0, Motor4_SpeedX=0,
+        Motor1_SpeedY=0, Motor2_SpeedY=0, Motor3_SpeedY=0, Motor4_SpeedY=0;
+        Motor_DIRECTION Motor1_Direction = Motor_Forward,Motor2_Direction = Motor_Forward,Motor3_Direction = Motor_Forward,Motor4_Direction = Motor_Forward;
+        Gyroscopes_ARRAY_Handle();
         //Calculation of the speed of each motor in the X direction.
         if(TIM_CNT<StartEnd_CostCNTX)
         {
@@ -545,9 +567,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         TIM_CNT++;
     }
 }
-/**
- * @brief Just to VOID_FUNCTION
- *  
- */
-HAL_StatusTypeDef VOID_FUNCTION(float AIM_XPosition,float AIM_YPosition,float AIM_ZPosition){return HAL_OK;}
+
+HAL_StatusTypeDef VOID_FUNCTION(void){return HAL_OK;}
 #endif 
