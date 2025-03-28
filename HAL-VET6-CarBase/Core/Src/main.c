@@ -51,7 +51,7 @@
 /* USER CODE BEGIN PV */
 uint8_t DEBUG_USART[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 Color Mission_Order[6]={Green,Blue,Red,Blue,Green,Red};
-const Color Color_Order[3]={Blue,Green,Red};
+Color Color_Order[3]={Blue,Green,Red};                 //颜色顺序
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,7 +65,7 @@ void Position_Test(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+#define Rotation_direction  -1 //逆时针-1顺时针1全夹0
 /* USER CODE END 0 */
 
 /**
@@ -120,19 +120,19 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   LED_ONOFF(LED_ALL,0);
   ////////////////////////Test
-  enum Mission_Current Mission_Select=QR_First	;
+  enum Mission_Current Mission_Select=QR_First;
   ///////////////////////QR_First
   while (1)
   {
 		switch (Mission_Select)
 		{
 			case Test:
-        LED_ONOFF(LED3,1);
+        LED_ONOFF(LED3,1);//while(1);
         /*_____________CARBASE_____________*/
-        // TURN(Car_Posture_Right,Car_Posture_Left);
+        // TURN(Car_Posture_Right,Car_Posture_Up);
         // CarMove_TO_Global(RoughProcess_CARPOSITION.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Temporary_CARPOSITION.Posture,VOID_FUNCTION);
         // CarMove_TO_Global(Temporary_CARPOSITION.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Temporary_CARPOSITION.Posture,VOID_FUNCTION);
-        // CarMove_TO_Global(0,1000,Car_Posture_Up,VOID_FUNCTION);
+        // CarMove_TO_Global(0,10,Car_Posture_Left,VOID_FUNCTION);
         // HAL_Delay(500);
         // Error_compensation(Raw_Material_Compensation); 
         // Error_compensation(Angle_compensation);
@@ -144,21 +144,25 @@ int main(void)
         // }
         // Position_Test();
         /*_____________ROBOTICARM_____________*/
-        ROBOTICArm_DirectlyMove(Raw_Material_Scanning.XPosition,Raw_Material_Scanning.YPosition,Raw_Material_Scanning.ZPosition,Claw_ReleaseFull,1,500);
-        // ROBOTICArm_DirectlyMove(Raw_Material_ClawFront.XPosition-10,Raw_Material_ClawFront.YPosition-10,Raw_Material_Scanning.ZPosition,Claw_ReleaseFull,200,1);
-        // SERVO_ClawSet(Claw_ReleaseFull);
+        // ROBOTICArm_DirectlyMove(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_PlacementLocation_Unstack.ZPosition,Claw_ReleaseFull,1,500);
+        // ROBOTICArm_DirectlyMove(Raw_Material_Scanning.XPosition-110,Raw_Material_Scanning.YPosition,Raw_Material_Scanning.ZPosition+10,Claw_ReleaseFull,200,1000);
+        // ROBOTICArm_DirectlyMove(Raw_Material_ClawFront.XPosition,Raw_Material_ClawFront.YPosition,Raw_Material_ClawFront.ZPosition,Claw_ReleaseFull,200,1000);
+        // ROBOTICArm_DirectlyMove(Raw_Material_ClawLeft.XPosition+20,Raw_Material_ClawLeft.YPosition,Raw_Material_ClawLeft.ZPosition+50,Claw_ReleaseFull,200,1);
+        // SERVO_ClawSet(Claw_ReleaseFull);         
         /*_____________MISSION_____________*/
         // while(rk3588_Arry[1]==0x67)HAL_Delay(10);
         // LED_ONOFF(LED1,0);
         // for (uint8_t i = 0; i < 6; i++)Mission_Order[i]=(Color)(rk3588_Arry[i+2]-1);
         Raw_Material();
-        //  Rough_processing();
+        // Rough_processing();
         // Temporary_storage();
-        /*_____________OTHER_____________*/
+        // HAL_Delay(100);
+        // Temporary_storage();
+        /*_____________OTHER_____________*/ 
         OLED_SHOWBIGNUM();
         LED_ONOFF(LED3,0);
         Mission_Select=None;
-        break;
+        break;  
       /*-------------------------------------------------------------------------------------------------------------------------------------------*/
 			case QR_First:
         //Start and scanning QR code
@@ -184,10 +188,11 @@ int main(void)
         CarMove_TO_Global(RoughProcess_CARPOSITION.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Temporary_CARPOSITION.Posture,VOID_FUNCTION);
         CarMove_TO_Global(Temporary_CARPOSITION.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Temporary_CARPOSITION.Posture,VOID_FUNCTION);
         Temporary_storage();
+        ROBOTICArm_initialize();
       /*-------------------------------------------------------------------------------------------------------------------------------------------*/
       case Raw_Material_Second: 
         //Raw_Material_Second
-        CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Car_Posture_Up,VOID_FUNCTION);
+        CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,Temporary_CARPOSITION.Y_POSITION,Car_Posture_Up,ROBOTICArm_initialize);
         CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,RawMaterial_CARPOSITION_Second.Y_POSITION,RawMaterial_CARPOSITION_Second.Posture,VOID_FUNCTION);
         Raw_Material();
       case Rough_processing_Second:
@@ -200,6 +205,7 @@ int main(void)
         CarMove_TO_Global(RoughProcess_CARPOSITION_Second.X_POSITION,Temporary_CARPOSITION_Second.Y_POSITION,Temporary_CARPOSITION_Second.Posture,VOID_FUNCTION);
         CarMove_TO_Global(Temporary_CARPOSITION_Second.X_POSITION,Temporary_CARPOSITION_Second.Y_POSITION,Temporary_CARPOSITION_Second.Posture,VOID_FUNCTION);
         Temporary_storage();
+        ROBOTICArm_initialize();
       case End:
         //End
         CarMove_TO_Global(RawMaterial_CARPOSITION_Second.X_POSITION,Temporary_CARPOSITION_Second.Y_POSITION,Start_CARPOSITION_Second.Posture,VOID_FUNCTION);
@@ -273,6 +279,15 @@ void Raw_Material(void)
   uint8_t Forward_ColorNum=0,Mission_ColorNum=0;
   //Error compensation before clamping
   Error_compensation(Raw_Material_Compensation);
+  LED_ONOFF(LED3,1);
+  HAL_Delay(100);
+  Send_MissionPack(Raw_Material_Mission,Red);
+	rk3588_Arry[6]=0; 
+  while(rk3588_Arry[6]!=0x03)HAL_Delay(10);
+  rk3588_Arry[6]=0; 
+  for (uint8_t i = 0; i < 3; i++)Color_Order[i]=(Color)(rk3588_Arry[i+2]);
+  HAL_Delay(100);
+  LED_ONOFF(LED3,0);
   //Three times clamping
   rk3588_Arry[6]=0x00;
   Variable_Flag Claw_=No;
@@ -288,11 +303,11 @@ void Raw_Material(void)
     Forward_Color=rk3588_Arry[7];
     rk3588_Arry[6]=0x00;
     //Analysis sequence
-    if(Mission_Order[n+Raw_Material_CNT*3]==Forward_Color)
+    if(Mission_Order[n+Raw_Material_CNT*3]==Forward_Color)//就在面前
     {
       // ROBOTICArm_DirectlyMove(Raw_Material_ClawFront.XPosition-10,Raw_Material_ClawFront.YPosition-10,Raw_Material_ClawFront.ZPosition+100,Claw_ReleaseFull,200,1);
       #if Rotation_direction==-1
-      ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawFront.XPosition-20,Raw_Material_ClawFront.YPosition+15,Raw_Material_ClawFront.ZPosition,Claw_Clawing,200);
+      ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawFront.XPosition-40,Raw_Material_ClawFront.YPosition+15,Raw_Material_ClawFront.ZPosition,Claw_Clawing,400);
       #elif Rotation_direction==1
       ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawFront.XPosition-40,Raw_Material_ClawFront.YPosition-15,Raw_Material_ClawFront.ZPosition,Claw_Clawing,200);
       #elif Rotation_direction==0
@@ -318,44 +333,44 @@ void Raw_Material(void)
           Mission_ColorNum=i;break;
         }
       }
-      //Analyze whether it is adjacent or other
+      //面前的和任务所需的索引差值
       int8_t Delta_Num=((int8_t)Forward_ColorNum-(int8_t)Mission_ColorNum);
-      if(abs(Delta_Num)==2)
+      if(abs(Delta_Num)==2)//不是相邻的
       {
         if(Delta_Num>0)
-        {
+        {//面前的在靠后索引，所需的在靠前索引
           #if Rotation_direction==1||Rotation_direction==0
-          ROBOTICArm_DirectlyMove(Raw_Material_ClawRight.XPosition+50,Raw_Material_ClawRight.YPosition,Raw_Material_ClawRight.ZPosition,Claw_ReleaseFull,100,1);
+          ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawRight.XPosition+50,Raw_Material_ClawRight.YPosition,Raw_Material_ClawRight.ZPosition+10,Claw_ReleaseFull,1);
 					ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawRight.XPosition,Raw_Material_ClawRight.YPosition,Raw_Material_ClawRight.ZPosition,Claw_Clawing,250);
           ROBOTICArm_DirectlyMove(Raw_Material_ClawRight.XPosition,Raw_Material_ClawRight.YPosition,Raw_Material_ClawRight.ZPosition+150,Claw_Clawing,50,1);
           Claw_=Yes;
           #endif
         }
         else
-        {
+        {//面前的在靠前索引，所需的在靠后索引
           #if Rotation_direction==-1||Rotation_direction==0
-         	ROBOTICArm_DirectlyMove(Raw_Material_ClawLeft.XPosition+50,Raw_Material_ClawLeft.YPosition,Raw_Material_ClawLeft.ZPosition,Claw_ReleaseFull,100,1);
+          ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawLeft.XPosition+50,Raw_Material_ClawLeft.YPosition,Raw_Material_ClawLeft.ZPosition+10,Claw_ReleaseFull,1);
 					ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawLeft.XPosition,Raw_Material_ClawLeft.YPosition,Raw_Material_ClawLeft.ZPosition,Claw_Clawing,250);
           ROBOTICArm_DirectlyMove(Raw_Material_ClawLeft.XPosition,Raw_Material_ClawLeft.YPosition,Raw_Material_ClawLeft.ZPosition+150,Claw_Clawing,50,1);
           Claw_=Yes;
           #endif
         }
       }
-      else 
+      else //相邻的
       {
         if(Delta_Num>0)
-        {
+        {//面前的靠后，目标的靠前
           #if Rotation_direction==-1||Rotation_direction==0
-					ROBOTICArm_DirectlyMove(Raw_Material_ClawLeft.XPosition+50,Raw_Material_ClawLeft.YPosition,Raw_Material_ClawLeft.ZPosition,Claw_ReleaseFull,100,1);
+					ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawLeft.XPosition+50,Raw_Material_ClawLeft.YPosition,Raw_Material_ClawLeft.ZPosition+10,Claw_ReleaseFull,1);
 					ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawLeft.XPosition,Raw_Material_ClawLeft.YPosition,Raw_Material_ClawLeft.ZPosition,Claw_Clawing,250);
           ROBOTICArm_DirectlyMove(Raw_Material_ClawLeft.XPosition,Raw_Material_ClawLeft.YPosition,Raw_Material_ClawLeft.ZPosition+150,Claw_Clawing,50,1);
           Claw_=Yes;
           #endif
         }
         else
-        {
+        {//面前的靠前，目标的靠后
           #if Rotation_direction==1||Rotation_direction==0
-          ROBOTICArm_DirectlyMove(Raw_Material_ClawRight.XPosition+50,Raw_Material_ClawRight.YPosition,Raw_Material_ClawRight.ZPosition,Claw_ReleaseFull,100,1);
+          ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawRight.XPosition+50,Raw_Material_ClawRight.YPosition,Raw_Material_ClawRight.ZPosition+10,Claw_ReleaseFull,1);
 					ROBOTICArm_linearInterpolationAlgorithm(Raw_Material_ClawRight.XPosition,Raw_Material_ClawRight.YPosition,Raw_Material_ClawRight.ZPosition,Claw_Clawing,250);
           ROBOTICArm_DirectlyMove(Raw_Material_ClawRight.XPosition,Raw_Material_ClawRight.YPosition,Raw_Material_ClawRight.ZPosition+150,Claw_Clawing,50,1);
           Claw_=Yes;
@@ -363,7 +378,7 @@ void Raw_Material(void)
         }
       }
     }
-    ROBOTICArm_DirectlyMove(Raw_Material_Scanning.XPosition,Raw_Material_Scanning.YPosition,Raw_Material_Scanning.ZPosition,Claw_Clawing,1,1);
+    // ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_Clawing,100,1);
     //Store in warehouse
     if(Claw_==Yes)
     {
@@ -372,19 +387,19 @@ void Raw_Material(void)
       switch (Mission_Order[n+Raw_Material_CNT*3])
       {
       case Red:
-        ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+90,Claw_Clawing,1000,1);
-        ROBOTICArm_linearInterpolationAlgorithm(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition,Claw_Release,200);
-        ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+50,Claw_Release,200,1);
+        ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+90,Claw_Clawing,800,1);
+        ROBOTICArm_linearInterpolationAlgorithm(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition,Claw_Release,150);
+        ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+50,Claw_Release,100,1);
         break;
       case Green:
-        ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+80,Claw_Clawing,800,1);
-				ROBOTICArm_linearInterpolationAlgorithm(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition,Claw_Release,200);
-        ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+50,Claw_Release,200,1);
+        ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+80,Claw_Clawing,600,1);
+				ROBOTICArm_linearInterpolationAlgorithm(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition,Claw_Release,150);
+        ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+50,Claw_Release,100,1);
         break;
       case Blue:
-        ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+90,Claw_Clawing,700,1);
-				ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition,Claw_Release,200);
-        ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+90,Claw_Release,200,1);
+        ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+90,Claw_Clawing,500,1);
+				ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition,Claw_Release,150);
+        ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+90,Claw_Release,100,1);
         break;
       default:
         break;
@@ -412,43 +427,43 @@ void Rough_processing(void)
     {
     case Red:
       //Claw from WareHouse
-      ROBOTICArm_linearInterpolationAlgorithm(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+75,Claw_Release,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+70,Claw_Release,1);
       ROBOTICArm_linearInterpolationAlgorithm(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition,Claw_Clawing,300);
-      ROBOTICArm_linearInterpolationAlgorithm(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+75,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+70,Claw_Clawing,1);
       //Goto Midpoint
-      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+75,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+60,Claw_Clawing,1);
       //Goto PacePoint
       ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_PlacementLocation_Unstack.ZPosition,Claw_Release,200);
-      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_PlacementLocation_Unstack.ZPosition+100,Claw_Release,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_PlacementLocation_Unstack.ZPosition+60,Claw_Release,1);
       break;
     case Green:
       //Claw from WareHouse
-      ROBOTICArm_linearInterpolationAlgorithm(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+75,Claw_Release,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+70,Claw_Release,1);
       ROBOTICArm_linearInterpolationAlgorithm(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition,Claw_Clawing,300);
-      ROBOTICArm_linearInterpolationAlgorithm(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+75,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+70,Claw_Clawing,1);
       //Goto Midpoint
-      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+75,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+70,Claw_Clawing,1);
       //Goto PacePoint
-      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition+100,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition+60,Claw_Clawing,1);
       ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition,Claw_Release,300);
-      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition+100,Claw_Release,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition+60,Claw_Release,1);
       break;
     case Blue:
       //Claw from WareHouse
-      ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+75,Claw_Release,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+70,Claw_Release,1);
       ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition,Claw_Clawing,300);
-      ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+75,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+70,Claw_Clawing,1);
       //Goto Midpoint
-      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+75,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+70,Claw_Clawing,1);
       //Goto PacePoint
-      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition+100,Claw_Clawing,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition+50,Claw_Clawing,1);
       ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition,Claw_Release,300);
-      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition+100,Claw_Release,1);
+      ROBOTICArm_linearInterpolationAlgorithm(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition+50,Claw_Release,1);
       break;
     default:
       break;
     }
-    ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+75,Claw_Release,1);
+    ROBOTICArm_linearInterpolationAlgorithm(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+70,Claw_Release,1);
     //Goto Midpoint
     n++;
   }
@@ -460,8 +475,8 @@ void Rough_processing(void)
     {
     case Red:
       //Claw from PacePoint
-      ROBOTICArm_DirectlyMove(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition-15,Red_Warehouse.ZPosition+75,Claw_Release,300,1);
-      ROBOTICArm_DirectlyMove(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_PlacementLocation_Unstack.ZPosition,Claw_Clawing,200,200);
+      ROBOTICArm_DirectlyMove(Red_PlacementLocation_Unstack.XPosition-5,Red_PlacementLocation_Unstack.YPosition-5,Red_Warehouse.ZPosition+75,Claw_ReleaseFull,300,1);
+      ROBOTICArm_DirectlyMove(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_PlacementLocation_Unstack.ZPosition,Claw_Clawing,200,300);
       ROBOTICArm_DirectlyMove(Red_PlacementLocation_Unstack.XPosition,Red_PlacementLocation_Unstack.YPosition,Red_Warehouse.ZPosition+75,Claw_Clawing,100,1);
       //Goto WareHouse
       ROBOTICArm_linearInterpolationAlgorithm(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+75,Claw_Clawing,1);
@@ -469,26 +484,25 @@ void Rough_processing(void)
       ROBOTICArm_DirectlyMove(Red_Warehouse.XPosition,Red_Warehouse.YPosition,Red_Warehouse.ZPosition+75,Claw_Release,100,1);
       break;
     case Green:
-      //Claw from WareHouse
+      //Claw from PacePoint
       ROBOTICArm_DirectlyMove(Green_PlacementLocation_Unstack.XPosition+10,Green_PlacementLocation_Unstack.YPosition-10,Green_Warehouse.ZPosition+75,Claw_ReleaseFull,200,300);
       ROBOTICArm_DirectlyMove(Green_PlacementLocation_Unstack.XPosition+10,Green_PlacementLocation_Unstack.YPosition-10,Green_PlacementLocation_Unstack.ZPosition+65,Claw_ReleaseFull,1,200);
       ROBOTICArm_linearInterpolationAlgorithm(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_PlacementLocation_Unstack.ZPosition,Claw_Clawing,300);
       //Goto Midpoint
       ROBOTICArm_DirectlyMove(Green_PlacementLocation_Unstack.XPosition,Green_PlacementLocation_Unstack.YPosition,Green_Warehouse.ZPosition+75,Claw_Clawing,200,1);
-      //Goto PacePoint
+      //Goto WareHouse
       ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+75,Claw_Clawing,400,1);
       ROBOTICArm_linearInterpolationAlgorithm(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition,Claw_Release,300);
       ROBOTICArm_DirectlyMove(Green_Warehouse.XPosition,Green_Warehouse.YPosition,Green_Warehouse.ZPosition+75,Claw_Release,100,1);
       break;
     case Blue:
-      //Claw from WareHouse
-      ROBOTICArm_DirectlyMove(Blue_PlacementLocation_Unstack.XPosition+5,Blue_PlacementLocation_Unstack.YPosition-18,Blue_Warehouse.ZPosition+75,Claw_Release,300,300);
+      //Claw from PacePoint
+      ROBOTICArm_DirectlyMove(Blue_PlacementLocation_Unstack.XPosition+13,Blue_PlacementLocation_Unstack.YPosition-18,Blue_Warehouse.ZPosition+75,Claw_Release,200,300);
       ROBOTICArm_DirectlyMove(Blue_PlacementLocation_Unstack.XPosition,Blue_PlacementLocation_Unstack.YPosition,Blue_PlacementLocation_Unstack.ZPosition,Claw_Clawing,200,200);
       //Goto Midpoint
       ROBOTICArm_DirectlyMove(Relay_point.XPosition,Relay_point.YPosition,Relay_point.ZPosition,Claw_Clawing,200,1);
-      //Goto PacePoint
+      //Goto WareHouse
       ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+75,Claw_Clawing,300,1);
-      ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+25,Claw_Clawing,300);
       ROBOTICArm_linearInterpolationAlgorithm(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition,Claw_Release,300);
       ROBOTICArm_DirectlyMove(Blue_Warehouse.XPosition,Blue_Warehouse.YPosition,Blue_Warehouse.ZPosition+75,Claw_Release,100,1);
       break;
@@ -507,7 +521,7 @@ void Temporary_storage(void)
   static uint8_t Temporary_storage_CNT = 0;
   if(Temporary_storage_CNT==0)
   {
-    // Error_compensation(Angle_compensation);
+    Error_compensation(Angle_compensation);
     Error_compensation(UnStacking_Correction);
   }
   else

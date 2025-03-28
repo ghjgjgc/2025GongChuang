@@ -4,6 +4,12 @@
             "path": "."
         }
     ],
-    "settings": {},
+    "settings": {
+        "files.associations": {
+            "robotic_arm.h": "c",
+            "main.h": "c",
+            "usart.h": "c"
+        }
+    },
     "extensions": {}
 }

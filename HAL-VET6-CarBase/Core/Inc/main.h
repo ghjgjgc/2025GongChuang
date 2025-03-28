@@ -85,8 +85,7 @@ typedef struct {
 #define SpecialONOFF 0
 extern uint8_t DEBUG_USART[];
 typedef enum{Yes=1,No=0}Variable_Flag;
-#define Rotation_direction  1
-extern const Color Color_Order[3];//Color_Order
+extern Color Color_Order[3];//Color_Order
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -20,6 +20,7 @@ extern const ROBOTICArm_Pose Raw_Material_Scanning,Raw_Material_ClawFront,Raw_Ma
 	Blue_PlacementLocation_Unstack,Green_PlacementLocation_Unstack,Red_PlacementLocation_Unstack,
 	Blue_PlacementLocation_stack,Green_PlacementLocation_stack,Red_PlacementLocation_stack,
 	Relay_point;
+extern const float Base_GreenAngle;
 /* USER CODE END PV */
 
 /* USER CODE BEGIN PFP */
@@ -27,6 +28,6 @@ HAL_StatusTypeDef ROBOTICArm_Coordinate_Calculation(float AIM_XPosition,float AI
 HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm_Moving(float Final_XPosition,float Final_YPosition,float Final_ZPosition);
 HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t Claw_Delay_Time);
 HAL_StatusTypeDef ROBOTICArm_DirectlyMove(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t GoTO_Delay_Time ,uint32_t Claw_Delay_Time );
-void ROBOTICArm_initialize(void);
+HAL_StatusTypeDef ROBOTICArm_initialize(void);
 /* USER CODE END PFP */
 #endif 

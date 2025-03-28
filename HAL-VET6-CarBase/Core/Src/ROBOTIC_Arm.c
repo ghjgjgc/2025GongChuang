@@ -1,29 +1,30 @@
 #include "ROBOTIC_Arm.h"
+#include "usart.h"
 /*Setting*/
-#define Insurance_set 1
+#define Insurance_set 0
 #define Raw_Material_Area_Height 135
 #define WareHouseHeight 145
-#define UnstackHeight 70
-#define StackHeight 130
+#define UnstackHeight 67
+#define StackHeight 128
 /*Storage of underlying data*/
-const ROBOTICArm_Pose Raw_Material_Scanning={-165,0,220};
-const ROBOTICArm_Pose Raw_Material_ClawFront={-115,0,Raw_Material_Area_Height};
-const ROBOTICArm_Pose Raw_Material_ClawLeft={-320,-30,Raw_Material_Area_Height};
-const ROBOTICArm_Pose Raw_Material_ClawRight={-312.5,80,Raw_Material_Area_Height};
+const ROBOTICArm_Pose Raw_Material_Scanning={-160,23,220};
+const ROBOTICArm_Pose Raw_Material_ClawFront={-125,0,Raw_Material_Area_Height};
+const ROBOTICArm_Pose Raw_Material_ClawLeft={-320,-50,Raw_Material_Area_Height};
+const ROBOTICArm_Pose Raw_Material_ClawRight={-317,80,Raw_Material_Area_Height+2};
 
-const ROBOTICArm_Pose Blue_Warehouse={165,80,WareHouseHeight};
+const ROBOTICArm_Pose Blue_Warehouse={168,75,WareHouseHeight};
 const ROBOTICArm_Pose Green_Warehouse={168,5,WareHouseHeight};
-const ROBOTICArm_Pose Red_Warehouse={165,-80,WareHouseHeight};
+const ROBOTICArm_Pose Red_Warehouse={173,-79,WareHouseHeight};
 
-const ROBOTICArm_Pose Place_Scaning={-6,210,190};
+const ROBOTICArm_Pose Place_Scaning={21,220,190};
 
-const ROBOTICArm_Pose Blue_PlacementLocation_Unstack={-140,223,UnstackHeight};
-const ROBOTICArm_Pose Green_PlacementLocation_Unstack={-7,223.5,UnstackHeight};
-const ROBOTICArm_Pose Red_PlacementLocation_Unstack={132,234,UnstackHeight};
+const ROBOTICArm_Pose Blue_PlacementLocation_Unstack={-98.5,254,UnstackHeight};
+const ROBOTICArm_Pose Green_PlacementLocation_Unstack={26.5,234,UnstackHeight-1};
+const ROBOTICArm_Pose Red_PlacementLocation_Unstack={164,231.5,UnstackHeight-1};
 
-const ROBOTICArm_Pose Blue_PlacementLocation_stack={-140,220,StackHeight};
-const ROBOTICArm_Pose Green_PlacementLocation_stack={-7,220,StackHeight};
-const ROBOTICArm_Pose Red_PlacementLocation_stack={132,230,StackHeight};
+const ROBOTICArm_Pose Blue_PlacementLocation_stack={-98.5,256,StackHeight};
+const ROBOTICArm_Pose Green_PlacementLocation_stack={26.5,234,StackHeight};
+const ROBOTICArm_Pose Red_PlacementLocation_stack={164.5,230.5,StackHeight};
 
 const ROBOTICArm_Pose Relay_point={-11.5,200,240};
 
@@ -39,8 +40,8 @@ const float Bigarm_Length=120.0;
 
 const float Bigarm_UpwardAngle=103.0;
 const float Forearm_UptwardAngle=65.0;
-const float Base_GreenAngle=47.5;
-#define linearInterpolationAlgorithm_StepNum 10.0f
+const float Base_GreenAngle=65;
+#define linearInterpolationAlgorithm_StepNum 20.0f
 /**
  * @brief Robotic arm moves to the designated position.
  * 
@@ -83,10 +84,10 @@ HAL_StatusTypeDef ROBOTICArm_Coordinate_Calculation(float AIM_XPosition,float AI
     /*Insurance settings*/
     HAL_StatusTypeDef Coordinate_Calculation_Flag=HAL_OK;
     #if Insurance_set==1
-        Coordinate_Calculation_Flag=(270>Base_Angle&&Base_Angle>0)&&(170>(Bigarm_UpwardAngle+180-Big_ArmAngle)&&(Bigarm_UpwardAngle+180-Big_ArmAngle)>75)&&(160>(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180))&&(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180))>50)?HAL_OK:HAL_ERROR;
-        uint8_t Fail_Message[]={(270>Base_Angle&&Base_Angle>0),Base_Angle,
-        (170>(Bigarm_UpwardAngle+180-Big_ArmAngle)&&(Bigarm_UpwardAngle+180-Big_ArmAngle)>75),(Bigarm_UpwardAngle+180-Big_ArmAngle),
-        (160>(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180))&&(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180))>50),(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180))};
+        Coordinate_Calculation_Flag=(270>Base_Angle&&Base_Angle>0)&&(176>(Bigarm_UpwardAngle+180-Big_ArmAngle)&&(Bigarm_UpwardAngle+180-Big_ArmAngle)>75)&&(160>(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180))&&(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180))>50)?HAL_OK:HAL_ERROR;
+        // uint8_t Fail_Message[]={(270>Base_Angle&&Base_Angle>0),Base_Angle,
+        // (170>(Bigarm_UpwardAngle+180-Big_ArmAngle)&&(Bigarm_UpwardAngle+180-Big_ArmAngle)>75),(Bigarm_UpwardAngle+180-Big_ArmAngle),
+        // (160>(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180))&&(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180))>50),(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180))};
         // HAL_UART_Transmit(&huart4,(const uint8_t*)Fail_Message,6,0xff);
     #endif
     if(Coordinate_Calculation_Flag==HAL_OK)
@@ -94,6 +95,7 @@ HAL_StatusTypeDef ROBOTICArm_Coordinate_Calculation(float AIM_XPosition,float AI
         SERVO_AngleSet(SERVO_Base,Base_Angle);
         SERVO_AngleSet(SERVO_BigArm,(Bigarm_UpwardAngle+180-Big_ArmAngle));
         SERVO_AngleSet(SERVO_ForeArm,(Forearm_UptwardAngle+(Big_ArmAngle+ForeArm_angle-180)));
+        
         return HAL_OK;
     }
     else return HAL_ERROR;
@@ -102,7 +104,7 @@ HAL_StatusTypeDef ROBOTICArm_Coordinate_Calculation(float AIM_XPosition,float AI
  * @brief Resetting and initializing the robotic arm.
  * 
  */
-void ROBOTICArm_initialize(void)
+HAL_StatusTypeDef ROBOTICArm_initialize(void)
 {
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
@@ -112,6 +114,7 @@ void ROBOTICArm_initialize(void)
     SERVO_ClawSet(Claw_Release);
     Current_state=Initial_state;
     Past_state=Initial_state;
+    return HAL_OK;  
 }
 /**
  * @brief Linear interpolation of the robotic arm.
@@ -131,7 +134,7 @@ HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm_Moving(float Final_XPo
     static uint16_t FeedCNT=0;
 	static float LinearX_variation,LinearY_variation,LinearZ_variation;
 	static float FeedAmount,Step_X,Step_Y,Step_Z;
-    const uint16_t StartEndCNT=30;
+    const uint32_t MaxDelayTime = 10,MinDelayTime = 2;
 
     switch (linearInterpolationAlgorithm_state)
     {
@@ -170,19 +173,20 @@ HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm_Moving(float Final_XPo
                 ROBOTICArm_Coordinate_Calculation(Final_state.XPosition,Final_state.YPosition,Final_state.ZPosition);//due to float
                 linearInterpolationAlgorithm_state=0; 
                 FeedCNT=0;
+                HAL_Delay(150);
                 Past_state=Final_state;
                 LED_ONOFF(LED4,0);
                 return HAL_OK;
             }
-            if(FeedCNT <= StartEndCNT || FeedCNT >= FeedAmount - StartEndCNT)
-                Self_Delay(100);
-            else Self_Delay(5);
-
+            else if(FeedCNT <= FeedAmount/4)Self_Delay(MaxDelayTime-(MaxDelayTime-MinDelayTime)*4*FeedCNT/FeedAmount);
+            else if(FeedCNT >= FeedAmount*3/4)Self_Delay(MinDelayTime + (MaxDelayTime-MinDelayTime)*4*((FeedCNT-FeedAmount*3/4)/FeedAmount));
+            else Self_Delay(MinDelayTime);
             return HAL_BUSY;
         default:
             return HAL_OK;
     }
 }
+
 HAL_StatusTypeDef ROBOTICArm_linearInterpolationAlgorithm(float Final_XPosition,float Final_YPosition,float Final_ZPosition,Claw_Status Claw_Control,uint32_t Claw_Delay_Time)
 {
     while(ROBOTICArm_linearInterpolationAlgorithm_Moving(Final_XPosition,Final_YPosition,Final_ZPosition)!=HAL_OK);
@@ -219,4 +223,5 @@ HAL_StatusTypeDef ROBOTICArm_DirectlyMove(float Final_XPosition,float Final_YPos
     Current_state.Claw_Control=Claw_Control;
     return HAL_OK;
 }
+
 

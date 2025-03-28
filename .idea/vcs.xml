@@ -2,5 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Backup/DesktopIn3588-3.12/demo_python" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Backup/DesktopIn3588-3.12/demo_python/2025GongChuang" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Backup/DesktopIn3588-3.12/电赛" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Backup/demo_python" vcs="Git" />
   </component>
 </project>

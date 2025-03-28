@@ -39,7 +39,7 @@ extern UART_HandleTypeDef huart5;
 extern UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN Private defines */
-typedef enum{Motor_Forward,Motor_Backward}Motor_DIRECTION;
+typedef enum{Motor_Backward,Motor_Forward}Motor_DIRECTION;
 typedef enum{Motor1=1,Motor2=2,Motor3=3,Motor4=4}Motor_ID;
 #define UARTTest 0
 /* USER CODE END Private defines */
